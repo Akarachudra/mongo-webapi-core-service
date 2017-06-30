@@ -98,6 +98,10 @@
     <Compile Include="Controllers\System\StatusController.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Storage\IMongoSettings.cs" />
+    <Compile Include="Storage\IMongoStorage.cs" />
+    <Compile Include="Storage\MongoSettings.cs" />
+    <Compile Include="Storage\MongoStorage.cs" />
     <Compile Include="WebApp\ExceptionLogger.cs" />
     <Compile Include="WebApp\IApiService.cs" />
     <Compile Include="WebApp\IServiceSettings.cs" />
