@@ -295,5 +295,28 @@ namespace Mongo.Service.Core.Tests
             var idsAfer = storage.ReadIds(x => x.SomeData == "1");
             CollectionAssert.AreEquivalent(idsBefore, idsAfer);
         }
+
+        [Test]
+        public void CountIsCorrect()
+        {
+            var entity1 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "1"
+            };
+            var entity2 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "2"
+            };
+            
+            storage.Write(entity1);
+            Assert.AreEqual(1, storage.Count());
+            
+            storage.Write(entity2);
+            Assert.AreEqual(2, storage.Count());
+
+            Assert.AreEqual(1, storage.Count(x => x.SomeData == "2"));
+        }
     }
 }

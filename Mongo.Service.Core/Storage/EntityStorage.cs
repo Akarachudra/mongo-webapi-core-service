@@ -134,12 +134,12 @@ namespace Mongo.Service.Core.Storage
 
         public long Count()
         {
-            throw new NotImplementedException();
+            return Collection.Count(FilterDefinition<TEntity>.Empty);
         }
 
         public long Count(Expression<Func<TEntity, bool>> filter)
         {
-            throw new NotImplementedException();
+            return Collection.Count(filter);
         }
 
         public long GetLastTick()
