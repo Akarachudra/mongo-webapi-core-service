@@ -1,11 +1,26 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Mongo.Service.Core.Storable.Base;
+using Mongo.Service.Core.Storable.Indexes;
+using Mongo.Service.Core.Storable.System;
+using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storage
 {
     public class EntityStorage<TEntity> : IEntityStorage<TEntity> where TEntity : IBaseEntity
     {
+        private readonly IMongoCollection<CounterEntity> syncCollection;
+        private readonly string collectionName;
+
+        public EntityStorage(IMongoStorage mongoStorage, IIndexes<TEntity> indexes)
+        {
+            Collection = mongoStorage.GetCollection<TEntity>(out collectionName);
+            syncCollection = mongoStorage.GetSyncCollection();
+            indexes.CreateIndexes(Collection);
+        }
+
+        public IMongoCollection<TEntity> Collection { get; }
+
         public TEntity Read(Guid id)
         {
             throw new NotImplementedException();
@@ -42,7 +57,7 @@ namespace Mongo.Service.Core.Storage
         }
 
         public long ReadSyncedData(long lastSync, out TEntity[] newData, out TEntity[] deletedData,
-            Expression<Func<TEntity, bool>> additionalFilter = null)
+                                   Expression<Func<TEntity, bool>> additionalFilter = null)
         {
             throw new NotImplementedException();
         }

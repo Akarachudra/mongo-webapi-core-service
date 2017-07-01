@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq.Expressions;
 using Mongo.Service.Core.Storable.Base;
+using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storage
 {
     public interface IEntityStorage<TEntity> where TEntity : IBaseEntity
     {
+        IMongoCollection<TEntity> Collection { get; }
         TEntity Read(Guid id);
         TEntity[] Read(Expression<Func<TEntity, bool>> filter);    
         TEntity[] Read(int skip, int limit);
