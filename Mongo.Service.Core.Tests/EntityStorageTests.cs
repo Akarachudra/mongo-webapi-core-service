@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Mongo.Service.Core.Storable;
 using Mongo.Service.Core.Storable.Indexes;
 using Mongo.Service.Core.Storable.System;
@@ -289,7 +291,7 @@ namespace Mongo.Service.Core.Tests
                     SomeData = "1"
                 }
             };
-            
+
             storage.Write(entities);
             var idsBefore = entities.Select(x => x.Id);
             var idsAfer = storage.ReadIds(x => x.SomeData == "1");
@@ -309,14 +311,140 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid(),
                 SomeData = "2"
             };
-            
+
             storage.Write(entity1);
             Assert.AreEqual(1, storage.Count());
-            
+
             storage.Write(entity2);
             Assert.AreEqual(2, storage.Count());
 
             Assert.AreEqual(1, storage.Count(x => x.SomeData == "2"));
+        }
+
+        [Test]
+        public void CanAutoincrementLastTick()
+        {
+            var entity1 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "1"
+            };
+            var entity2 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "2"
+            };
+
+            Assert.AreEqual(0, storage.GetLastTick());
+
+            storage.Write(entity1);
+            var readedEntity1 = storage.Read(entity1.Id);
+            Assert.AreEqual(1, storage.GetLastTick());
+            Assert.AreEqual(1, readedEntity1.Ticks);
+
+            storage.Write(entity2);
+            var readedEntity2 = storage.Read(entity2.Id);
+            Assert.AreEqual(2, storage.GetLastTick());
+            Assert.AreEqual(2, readedEntity2.Ticks);
+        }
+
+        [Test]
+        public void CanReadSyncedData()
+        {
+            SampleEntity[] entities;
+            SampleEntity[] deletedEntities;
+            var sync = storage.ReadSyncedData(0, out entities, out deletedEntities);
+
+            Assert.AreEqual(0, sync);
+
+            var entity1 = new SampleEntity
+            {
+                Id = Guid.NewGuid()
+            };
+            storage.Write(entity1);
+
+            var entity2 = new SampleEntity
+            {
+                Id = Guid.NewGuid()
+            };
+            storage.Write(entity2);
+
+            sync = storage.ReadSyncedData(sync, out entities, out deletedEntities);
+
+            Assert.AreEqual(2, entities.Length);
+            Assert.AreEqual(2, sync);
+
+            var previousSync = sync;
+            sync = storage.ReadSyncedData(sync, out entities, out deletedEntities);
+
+            Assert.AreEqual(previousSync, sync);
+
+            storage.Remove(entity2);
+            sync = storage.ReadSyncedData(sync, out entities, out deletedEntities);
+            Assert.AreEqual(1, deletedEntities.Length);
+            Assert.AreEqual(3, sync);
+        }
+
+        [Test]
+        public void CanReadSyncedDataWithFilter()
+        {
+            SampleEntity[] entities;
+            SampleEntity[] deletedEntities;
+            var entity1 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "1"
+            };
+            storage.Write(entity1);
+
+            var entity2 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "2"
+            };
+            storage.Write(entity2);
+
+            var sync = storage.ReadSyncedData(0, out entities, out deletedEntities, x => x.SomeData == "2");
+
+            Assert.AreEqual(1, entities.Length);
+            Assert.AreEqual(2, sync);
+        }
+
+        [Test]
+        public void TestMultithreadedSyncedWriteRead()
+        {
+            const int count = 10;
+            var resultEntities = new SampleEntity[0];
+            Action writeAction = () =>
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    var entity = new SampleEntity
+                    {
+                        Id = Guid.NewGuid()
+                    };
+                    storage.Write(entity);
+                }
+            };
+            var thread1 = new Thread(() => writeAction.Invoke());
+            var thread2 = new Thread(() => writeAction.Invoke());
+            thread1.Start();
+            thread2.Start();
+            long sync = 0;
+            do
+            {
+                SampleEntity[] entities;
+                SampleEntity[] deletedEntities;
+                sync = storage.ReadSyncedData(sync, out entities, out deletedEntities);
+                resultEntities = resultEntities.Concat(entities).ToArray();
+            } while (sync < count * 2);
+
+            Assert.AreEqual(count * 2, resultEntities.Length);
+            for (var i = 1; i < resultEntities.Length; i++)
+            {
+                Assert.IsTrue(resultEntities[i - 1].Ticks == resultEntities[i].Ticks - 1);
+                Assert.AreEqual(i, resultEntities[i - 1].Ticks);
+            }
         }
     }
 }

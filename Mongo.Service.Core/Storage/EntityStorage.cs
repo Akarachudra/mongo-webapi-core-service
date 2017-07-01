@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storable.Indexes;
 using Mongo.Service.Core.Storable.System;
+using Mongo.Service.Core.Extensions;
 using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storage
@@ -77,7 +78,21 @@ namespace Mongo.Service.Core.Storage
         public long ReadSyncedData(long lastSync, out TEntity[] newData, out TEntity[] deletedData,
                                    Expression<Func<TEntity, bool>> additionalFilter = null)
         {
-            throw new NotImplementedException();
+            var newLastSync = GetLastTick();
+
+            Expression<Func<TEntity, bool>> newFilter = x => !x.IsDeleted && x.Ticks > lastSync && x.Ticks <= newLastSync;
+            Expression<Func<TEntity, bool>> deletedFilter = x => x.IsDeleted && x.Ticks > lastSync && x.Ticks <= newLastSync;
+            
+            if (additionalFilter != null)
+            {
+                newFilter = newFilter.And(additionalFilter);
+                deletedFilter = deletedFilter.And(additionalFilter);
+            }
+            
+            newData = Read(newFilter);
+            deletedData = Read(deletedFilter);
+
+            return newLastSync;
         }
 
         public bool Exists(Guid id)
@@ -92,6 +107,7 @@ namespace Mongo.Service.Core.Storage
                 entity.Id = Guid.NewGuid();
             }
             entity.LastModified = DateTime.UtcNow;
+            entity.Ticks = SafeGetIncrementedTick();
             Collection.ReplaceOne(x => x.Id == entity.Id, entity, new UpdateOptions { IsUpsert = true });
         }
 
@@ -144,7 +160,34 @@ namespace Mongo.Service.Core.Storage
 
         public long GetLastTick()
         {
-            throw new NotImplementedException();
+            var sort = Builders<TEntity>.Sort.Descending(x => x.Ticks);
+            var result = Collection.Find(FilterDefinition<TEntity>.Empty).Sort(sort).Limit(1).ToList();
+            return result.Count == 0 ? 0 : result[0].Ticks;
+        }
+
+        private long SafeGetIncrementedTick()
+        {
+            if (syncCollection.FindSync(x => x.Id == collectionName).FirstOrDefault() == null)
+            {
+                try
+                {
+                    syncCollection.InsertOne(new CounterEntity { Id = collectionName, CurrentTicks = 1 });
+                    return 1;
+                }
+                catch
+                {
+                    return IncrementTick();
+                }
+            }
+            return IncrementTick();
+        }
+
+        private long IncrementTick()
+        {
+            var filter = Builders<CounterEntity>.Filter.Eq(x => x.Id, collectionName);
+            var update = Builders<CounterEntity>.Update.Inc(x => x.CurrentTicks, 1);
+            var updateResult = syncCollection.FindOneAndUpdate(filter, update);
+            return updateResult.CurrentTicks + 1;
         }
     }
 }
