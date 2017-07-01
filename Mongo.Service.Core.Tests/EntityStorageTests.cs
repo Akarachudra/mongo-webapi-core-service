@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Mongo.Service.Core.Storable;
 using Mongo.Service.Core.Storable.Indexes;
 using Mongo.Service.Core.Storable.System;
@@ -111,17 +112,66 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid(),
                 SomeData = "testData"
             };
-            
+
             storage.Write(entity);
 
             SampleEntity resultEntity;
             var readResult = storage.TryRead(entity.Id, out resultEntity);
             Assert.IsTrue(readResult);
             Assert.AreEqual("testData", resultEntity.SomeData);
-            
+
             readResult = storage.TryRead(Guid.NewGuid(), out resultEntity);
             Assert.IsFalse(readResult);
             Assert.AreEqual(default(SampleEntity), resultEntity);
+        }
+
+        [Test]
+        public void CanReadWithSkipAndLimit()
+        {
+            var entities = new[]
+            {
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "1"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "2"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "3"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "3"
+                }
+            };
+            storage.Write(entities);
+            
+            var anonymousEntitiesBefore = entities.Select(x => new { x.Id, x.SomeData }).Take(2);
+            var readedEntities = storage.Read(0, 2);
+            var anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
+            CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
+
+            anonymousEntitiesBefore = entities.Where(x => x.SomeData == "3")
+                                              .Select(x => new { x.Id, x.SomeData })
+                                              .Skip(1)
+                                              .Take(1);
+            readedEntities = storage.Read(x => x.SomeData == "3", 1, 1);
+            anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
+            CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
+
+            anonymousEntitiesBefore = entities.Select(x => new { x.Id, x.SomeData })
+                                              .Skip(1)
+                                              .Take(2);
+            readedEntities = storage.Read(1, 2);
+            anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
+            CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
         }
     }
 }

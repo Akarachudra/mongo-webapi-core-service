@@ -39,12 +39,14 @@ namespace Mongo.Service.Core.Storage
 
         public TEntity[] Read(int skip, int limit)
         {
-            throw new NotImplementedException();
+            var entities = Collection.Aggregate().Skip(skip).Limit(limit).ToList();
+            return entities.ToArray();
         }
 
         public TEntity[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit)
         {
-            throw new NotImplementedException();
+            var entities = Collection.Aggregate().Match(filter).Skip(skip).Limit(limit).ToList();
+            return entities.ToArray();
         }
 
         public bool TryRead(Guid id, out TEntity outEntity)
