@@ -152,7 +152,7 @@ namespace Mongo.Service.Core.Tests
                 }
             };
             storage.Write(entities);
-            
+
             var anonymousEntitiesBefore = entities.Select(x => new { x.Id, x.SomeData }).Take(2);
             var readedEntities = storage.Read(0, 2);
             var anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
@@ -172,6 +172,128 @@ namespace Mongo.Service.Core.Tests
             readedEntities = storage.Read(1, 2);
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
+        }
+
+        [Test]
+        public void CanRemoveEntities()
+        {
+            var entity1 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                IsDeleted = false,
+                SomeData = "testData"
+            };
+            var entity2 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                IsDeleted = false,
+                SomeData = "testData"
+            };
+
+            storage.Write(entity1);
+            storage.Remove(entity1);
+
+            var readedEntity = storage.Read(entity1.Id);
+            Assert.IsTrue(readedEntity.IsDeleted);
+
+            storage.Write(entity1);
+            storage.Remove(entity1.Id);
+            readedEntity = storage.Read(entity1.Id);
+            Assert.IsTrue(readedEntity.IsDeleted);
+
+            storage.Write(entity1);
+            storage.Write(entity2);
+            storage.Remove(new[] { entity1.Id, entity2.Id });
+            var readedEntities = storage.Read(x => x.SomeData == "testData");
+            Assert.IsTrue(readedEntities[0].IsDeleted);
+            Assert.IsTrue(readedEntities[1].IsDeleted);
+
+            storage.Write(entity1);
+            storage.Write(entity2);
+            storage.Remove(new[] { entity1, entity2 });
+            readedEntities = storage.Read(x => x.SomeData == "testData");
+            Assert.IsTrue(readedEntities[0].IsDeleted);
+            Assert.IsTrue(readedEntities[1].IsDeleted);
+        }
+
+        [Test]
+        public void ExistsIsCorrect()
+        {
+            var entity = new SampleEntity
+            {
+                Id = Guid.NewGuid()
+            };
+
+            storage.Write(entity);
+            Assert.IsTrue(storage.Exists(entity.Id));
+            Assert.IsFalse(storage.Exists(Guid.NewGuid()));
+        }
+
+        [Test]
+        public void CanReadAll()
+        {
+            var entities = new[]
+            {
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "1"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "2"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "3"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "3"
+                }
+            };
+
+            storage.Write(entities);
+            var anonymousEntitiesBefore = entities.Select(x => new { x.Id, x.SomeData });
+            var readedEntities = storage.ReadAll();
+            var anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
+            CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
+        }
+
+        [Test]
+        public void CanReadIdsOnly()
+        {
+            var entities = new[]
+            {
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "1"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "1"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "1"
+                },
+                new SampleEntity
+                {
+                    Id = Guid.NewGuid(),
+                    SomeData = "1"
+                }
+            };
+            
+            storage.Write(entities);
+            var idsBefore = entities.Select(x => x.Id);
+            var idsAfer = storage.ReadIds(x => x.SomeData == "1");
+            CollectionAssert.AreEquivalent(idsBefore, idsAfer);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storable.Indexes;
@@ -63,12 +64,14 @@ namespace Mongo.Service.Core.Storage
 
         public TEntity[] ReadAll()
         {
-            throw new NotImplementedException();
+            var entities = Collection.FindSync(FilterDefinition<TEntity>.Empty).ToList();
+            return entities.ToArray();
         }
 
         public Guid[] ReadIds(Expression<Func<TEntity, bool>> filter)
         {
-            throw new NotImplementedException();
+            var ids = Collection.FindSync(filter).ToList().Select(x => x.Id).ToArray();
+            return ids;
         }
 
         public long ReadSyncedData(long lastSync, out TEntity[] newData, out TEntity[] deletedData,
@@ -79,7 +82,7 @@ namespace Mongo.Service.Core.Storage
 
         public bool Exists(Guid id)
         {
-            throw new NotImplementedException();
+            return Collection.FindSync(x => x.Id == id).FirstOrDefault() != null;
         }
 
         public void Write(TEntity entity)
@@ -102,22 +105,31 @@ namespace Mongo.Service.Core.Storage
 
         public void Remove(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = Read(id);
+            entity.IsDeleted = true;
+
+            Write(entity);
         }
 
         public void Remove(Guid[] ids)
         {
-            throw new NotImplementedException();
+            foreach (var id in ids)
+            {
+                Remove(id);
+            }
         }
 
         public void Remove(TEntity entity)
         {
-            throw new NotImplementedException();
+            Remove(entity.Id);
         }
 
         public void Remove(TEntity[] entities)
         {
-            throw new NotImplementedException();
+            foreach (var entity in entities)
+            {
+                Remove(entity.Id);
+            }
         }
 
         public long Count()
