@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Mongo.Service.Core.Tests</RootNamespace>
     <AssemblyName>Mongo.Service.Core.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
@@ -43,7 +46,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EntityStorageTests.cs" />
+    <Compile Include="Helpers\ObjectsComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Mongo.Service.Core\Mongo.Service.Core.csproj">
+      <Project>{dbfd3421-5e29-4aed-b490-fa3e0e8c6001}</Project>
+      <Name>Mongo.Service.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Mongo.Service.Types\Mongo.Service.Types.csproj">
+      <Project>{f5d4126c-d80f-4997-9de4-56c716dfa3f9}</Project>
+      <Name>Mongo.Service.Types</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

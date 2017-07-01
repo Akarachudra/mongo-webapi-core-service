@@ -34,8 +34,8 @@ namespace Mongo.Service.Core.Storage
                 mongoClientSettings.Credentials = new[]
                 {
                     MongoCredential.CreateCredential(mongoDataBaseName,
-                        mongoUserName,
-                        settings.MongoPassword)
+                                                     mongoUserName,
+                                                     settings.MongoPassword)
                 };
             }
 

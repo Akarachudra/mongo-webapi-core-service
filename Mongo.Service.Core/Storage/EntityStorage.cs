@@ -23,12 +23,18 @@ namespace Mongo.Service.Core.Storage
 
         public TEntity Read(Guid id)
         {
-            throw new NotImplementedException();
+            var entity = Collection.FindSync(x => x.Id == id).FirstOrDefault();
+            if (entity == null)
+            {
+                throw new Exception($"{typeof(TEntity).Name} with id {id} not found");
+            }
+            return entity;
         }
 
         public TEntity[] Read(Expression<Func<TEntity, bool>> filter)
         {
-            throw new NotImplementedException();
+            var entities = Collection.FindSync(filter).ToList();
+            return entities.ToArray();
         }
 
         public TEntity[] Read(int skip, int limit)
@@ -41,9 +47,16 @@ namespace Mongo.Service.Core.Storage
             throw new NotImplementedException();
         }
 
-        public bool TryRead(Guid id, out TEntity apiEntity)
+        public bool TryRead(Guid id, out TEntity outEntity)
         {
-            throw new NotImplementedException();
+            var entity = Collection.FindSync(x => x.Id == id).FirstOrDefault();
+            if (entity == null)
+            {
+                outEntity = default(TEntity);
+                return false;
+            }
+            outEntity = entity;
+            return true;
         }
 
         public TEntity[] ReadAll()
@@ -69,12 +82,20 @@ namespace Mongo.Service.Core.Storage
 
         public void Write(TEntity entity)
         {
-            throw new NotImplementedException();
+            if (entity.Id == Guid.Empty)
+            {
+                entity.Id = Guid.NewGuid();
+            }
+            entity.LastModified = DateTime.UtcNow;
+            Collection.ReplaceOne(x => x.Id == entity.Id, entity, new UpdateOptions { IsUpsert = true });
         }
 
         public void Write(TEntity[] entities)
         {
-            throw new NotImplementedException();
+            foreach (var entity in entities)
+            {
+                Write(entity);
+            }
         }
 
         public void Remove(Guid id)

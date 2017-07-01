@@ -12,7 +12,7 @@ namespace Mongo.Service.Core.Storage
         TEntity[] Read(Expression<Func<TEntity, bool>> filter);    
         TEntity[] Read(int skip, int limit);
         TEntity[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit);
-        bool TryRead(Guid id, out TEntity apiEntity);
+        bool TryRead(Guid id, out TEntity outEntity);
         TEntity[] ReadAll();
         Guid[] ReadIds(Expression<Func<TEntity, bool>> filter);
         long ReadSyncedData(long lastSync, out TEntity[] newData, out TEntity[] deletedData,
