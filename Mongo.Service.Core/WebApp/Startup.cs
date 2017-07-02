@@ -38,6 +38,7 @@ namespace Mongo.Service.Core.WebApp
 
         private static void ConfigureContainer(Container container)
         {
+            container.RegisterSingleton<IMongoStorage, MongoStorage>();
             container.RegisterSingleton<IMongoSettings, MongoSettings>();
             container.RegisterSingleton<IEntityStorage<SampleEntity>, EntityStorage<SampleEntity>>();
             container.RegisterSingleton<IIndexes<SampleEntity>, Indexes<SampleEntity>>();
