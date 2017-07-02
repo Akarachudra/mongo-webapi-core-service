@@ -13,11 +13,13 @@ namespace Mongo.Service.Core.Storage
     {
         private readonly IMongoCollection<CounterEntity> syncCollection;
         private readonly string collectionName;
+        private readonly object storageLocker;
 
         public EntityStorage(IMongoStorage mongoStorage, IIndexes<TEntity> indexes)
         {
             Collection = mongoStorage.GetCollection<TEntity>(out collectionName);
             syncCollection = mongoStorage.GetSyncCollection();
+            storageLocker = new object();
             indexes.CreateIndexes(Collection);
         }
 
@@ -107,8 +109,12 @@ namespace Mongo.Service.Core.Storage
                 entity.Id = Guid.NewGuid();
             }
             entity.LastModified = DateTime.UtcNow;
-            entity.Ticks = SafeGetIncrementedTick();
-            Collection.ReplaceOne(x => x.Id == entity.Id, entity, new UpdateOptions { IsUpsert = true });
+            lock (storageLocker)
+            {
+                //TODO: Task-1. Need better client data syncrhonization. Some data can be lost if using more than one front
+                entity.Ticks = SafeGetIncrementedTick();
+                Collection.ReplaceOne(x => x.Id == entity.Id, entity, new UpdateOptions { IsUpsert = true });
+            }
         }
 
         public void Write(TEntity[] entities)
