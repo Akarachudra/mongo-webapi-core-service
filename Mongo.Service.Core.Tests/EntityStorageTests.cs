@@ -182,13 +182,11 @@ namespace Mongo.Service.Core.Tests
             var entity1 = new SampleEntity
             {
                 Id = Guid.NewGuid(),
-                IsDeleted = false,
                 SomeData = "testData"
             };
             var entity2 = new SampleEntity
             {
                 Id = Guid.NewGuid(),
-                IsDeleted = false,
                 SomeData = "testData"
             };
 
@@ -198,24 +196,36 @@ namespace Mongo.Service.Core.Tests
             var readedEntity = storage.Read(entity1.Id);
             Assert.IsTrue(readedEntity.IsDeleted);
 
-            storage.Write(entity1);
-            storage.Remove(entity1.Id);
-            readedEntity = storage.Read(entity1.Id);
+            var entity3 = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "testData"
+            };
+
+            storage.Write(new[] { entity2, entity3 });
+            storage.Remove(new[] { entity2, entity3 });
+            readedEntity = storage.Read(entity2.Id);
             Assert.IsTrue(readedEntity.IsDeleted);
 
-            storage.Write(entity1);
-            storage.Write(entity2);
-            storage.Remove(new[] { entity1.Id, entity2.Id });
-            var readedEntities = storage.Read(x => x.SomeData == "testData");
-            Assert.IsTrue(readedEntities[0].IsDeleted);
-            Assert.IsTrue(readedEntities[1].IsDeleted);
+            readedEntity = storage.Read(entity3.Id);
+            Assert.IsTrue(readedEntity.IsDeleted);
+        }
 
-            storage.Write(entity1);
-            storage.Write(entity2);
-            storage.Remove(new[] { entity1, entity2 });
-            readedEntities = storage.Read(x => x.SomeData == "testData");
-            Assert.IsTrue(readedEntities[0].IsDeleted);
-            Assert.IsTrue(readedEntities[1].IsDeleted);
+        [Test]
+        public void CheckWriteIsNotRestoreDeletedEntity()
+        {
+            var entity = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "testData"
+            };
+            
+            storage.Write(entity);
+            storage.Remove(entity);
+            
+            storage.Write(entity);
+            var readedEntity = storage.Read(entity.Id);
+            Assert.IsTrue(readedEntity.IsDeleted);
         }
 
         [Test]

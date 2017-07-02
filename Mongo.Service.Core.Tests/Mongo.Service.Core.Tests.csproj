@@ -45,6 +45,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EntityServiceTests.cs" />
     <Compile Include="EntityStorageTests.cs" />
     <Compile Include="Helpers\ObjectsComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

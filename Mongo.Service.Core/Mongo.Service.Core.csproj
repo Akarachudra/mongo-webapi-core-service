@@ -99,6 +99,11 @@
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Extensions\PredicateBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Converters\Converter.cs" />
+    <Compile Include="Services\Converters\IConverter.cs" />
+    <Compile Include="Services\Converters\SampleConverter.cs" />
+    <Compile Include="Services\EntityService.cs" />
+    <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Storable\Base\BaseEntity.cs" />
     <Compile Include="Storable\Base\IBaseEntity.cs" />
     <Compile Include="Storable\Indexes\IIndexes.cs" />
@@ -124,7 +129,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Services\Converters" />
+    <ProjectReference Include="..\Mongo.Service.Types\Mongo.Service.Types.csproj">
+      <Project>{f5d4126c-d80f-4997-9de4-56c716dfa3f9}</Project>
+      <Name>Mongo.Service.Types</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

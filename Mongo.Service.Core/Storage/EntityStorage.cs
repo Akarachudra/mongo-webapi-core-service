@@ -108,6 +108,15 @@ namespace Mongo.Service.Core.Storage
             {
                 entity.Id = Guid.NewGuid();
             }
+            else
+            {
+                TEntity currentEntity;
+                var exists = TryRead(entity.Id, out currentEntity);
+                if (exists && currentEntity.IsDeleted)
+                {
+                    entity.IsDeleted = true;
+                }
+            }
             entity.LastModified = DateTime.UtcNow;
             lock (storageLocker)
             {

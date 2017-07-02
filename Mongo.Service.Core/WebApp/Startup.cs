@@ -1,6 +1,9 @@
 ﻿using System.Web.Http;
 using System.Web.Http.ExceptionHandling;
 using Microsoft.Owin;
+using Mongo.Service.Core.Storable;
+using Mongo.Service.Core.Storable.Indexes;
+using Mongo.Service.Core.Storage;
 using Owin;
 using SimpleInjector;
 using SimpleInjector.Integration.WebApi;
@@ -35,7 +38,9 @@ namespace Mongo.Service.Core.WebApp
 
         private static void ConfigureContainer(Container container)
         {
-            
+            container.RegisterSingleton<IMongoSettings, MongoSettings>();
+            container.RegisterSingleton<IEntityStorage<SampleEntity>, EntityStorage<SampleEntity>>();
+            container.RegisterSingleton<IIndexes<SampleEntity>, Indexes<SampleEntity>>();
         }
     }
 }
