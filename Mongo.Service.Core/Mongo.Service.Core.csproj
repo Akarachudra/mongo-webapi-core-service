@@ -96,6 +96,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\SampleController.cs" />
     <Compile Include="Controllers\System\StatusController.cs" />
     <Compile Include="EntryPoint.cs" />
     <Compile Include="Extensions\PredicateBuilder.cs" />

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiSample.cs" />
+    <Compile Include="ApiSync.cs" />
     <Compile Include="Base\ApiBase.cs" />
     <Compile Include="Base\IApiBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
