@@ -1,6 +1,5 @@
 ﻿using System;
 using Mongo.Service.Core.Storable.Base;
-using Mongo.Service.Core.Storable.System;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -44,20 +43,15 @@ namespace Mongo.Service.Core.Storage
             database = client.GetDatabase(mongoDataBaseName);
         }
 
-        public IMongoCollection<TEntity> GetCollection<TEntity>(out string collectionName) where TEntity : IBaseEntity
+        public IMongoCollection<TEntity> GetCollection<TEntity>() where TEntity : IBaseEntity
         {
-            collectionName = GetCollectionName(typeof(TEntity));
+            var collectionName = GetCollectionName(typeof(TEntity));
             return database.GetCollection<TEntity>(collectionName);
         }
 
         public void DropCollection<T>()
         {
             database.DropCollection(GetCollectionName(typeof(T)));
-        }
-
-        public IMongoCollection<CounterEntity> GetSyncCollection()
-        {
-            return database.GetCollection<CounterEntity>(GetCollectionName(typeof(CounterEntity)));
         }
 
         private static string GetCollectionName(Type type)

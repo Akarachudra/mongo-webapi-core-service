@@ -111,7 +111,6 @@
     <Compile Include="Storable\Indexes\IIndexes.cs" />
     <Compile Include="Storable\Indexes\Indexes.cs" />
     <Compile Include="Storable\SampleEntity.cs" />
-    <Compile Include="Storable\System\CounterEntity.cs" />
     <Compile Include="Storage\CollectionNameAttribute.cs" />
     <Compile Include="Storage\EntityStorage.cs" />
     <Compile Include="Storage\IEntityStorage.cs" />

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using Mongo.Service.Core.Storable;
 using Mongo.Service.Core.Storable.Indexes;
-using Mongo.Service.Core.Storable.System;
 using Mongo.Service.Core.Storage;
 using NUnit.Framework;
 
@@ -14,19 +13,18 @@ namespace Mongo.Service.Core.Tests
     public class EntityStorageTests
     {
         private readonly IMongoStorage mongoStorage;
-        private readonly IEntityStorage<SampleEntity> storage;
+        private IEntityStorage<SampleEntity> storage;
 
         public EntityStorageTests()
         {
-            mongoStorage = new MongoStorage(new MongoSettings());
-            storage = new EntityStorage<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
+            mongoStorage = new MongoStorage(new MongoSettings());  
         }
 
         [SetUp]
         public void RunBeforeAnyTest()
         {
-            mongoStorage.DropCollection<CounterEntity>();
             mongoStorage.DropCollection<SampleEntity>();
+            storage = new EntityStorage<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
         }
 
         [Test]
