@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongo.Service.Core", "Mongo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongo.Service.Core.Tests", "Mongo.Service.Core.Tests\Mongo.Service.Core.Tests.csproj", "{022D17D0-8CCF-41BC-A7EC-B66F2EBC19A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongo.Service.Types", "Mongo.Service.Types\Mongo.Service.Types.csproj", "{F5D4126C-D80F-4997-9DE4-56C716DFA3F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mongo.Service.Core.Types", "Mongo.Service.Core.Types\Mongo.Service.Core.Types.csproj", "{F5D4126C-D80F-4997-9DE4-56C716DFA3F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

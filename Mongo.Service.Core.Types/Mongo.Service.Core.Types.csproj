@@ -8,8 +8,8 @@
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Mongo.Service.Types</RootNamespace>
-    <AssemblyName>Mongo.Service.Types</AssemblyName>
+    <RootNamespace>Mongo.Service.Core.Types</RootNamespace>
+    <AssemblyName>Mongo.Service.Core.Types</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

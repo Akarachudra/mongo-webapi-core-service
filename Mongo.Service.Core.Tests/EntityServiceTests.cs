@@ -7,7 +7,7 @@ using Mongo.Service.Core.Storable.Indexes;
 using Mongo.Service.Core.Storable.System;
 using Mongo.Service.Core.Storage;
 using Mongo.Service.Core.Tests.Helpers;
-using Mongo.Service.Types;
+using Mongo.Service.Core.Types;
 using NUnit.Framework;
 
 namespace Mongo.Service.Core.Tests

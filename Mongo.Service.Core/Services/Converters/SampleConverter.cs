@@ -1,5 +1,5 @@
 ﻿using Mongo.Service.Core.Storable;
-using Mongo.Service.Types;
+using Mongo.Service.Core.Types;
 
 namespace Mongo.Service.Core.Services.Converters
 {
