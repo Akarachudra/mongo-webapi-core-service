@@ -423,7 +423,9 @@ namespace Mongo.Service.Core.Tests
         [Test]
         public void TestMultithreadedSyncedWriteRead()
         {
-            const int count = 30;
+            const int count = 100;
+            const int threadsCount = 5;
+            var threads = new Thread[threadsCount];
             var resultEntities = new SampleEntity[0];
             var writtenList = new List<SampleEntity>();
             var syncObj = new object();
@@ -442,33 +444,26 @@ namespace Mongo.Service.Core.Tests
                     }
                 }
             };
-            var thread1 = new Thread(() => writeAction.Invoke());
-            var thread2 = new Thread(() => writeAction.Invoke());
-            var thread3 = new Thread(() => writeAction.Invoke());
-            thread1.Start();
-            thread2.Start();
-            thread3.Start();
+            for (var i = 0; i < threadsCount; i++)
+            {
+                threads[i] = new Thread(() => writeAction.Invoke());
+                threads[i].Start();
+            }
             long sync = 0;
             var dateTimeStart = DateTime.UtcNow;
-            var maxReadTime = TimeSpan.FromSeconds(4);
+            var maxReadTime = TimeSpan.FromSeconds(20);
             do
             {
                 SampleEntity[] entities;
                 SampleEntity[] deletedEntities;
                 sync = storage.ReadSyncedData(sync, out entities, out deletedEntities);
                 resultEntities = resultEntities.Concat(entities).ToArray();
-            } while (sync < count * 3 && DateTime.UtcNow - dateTimeStart < maxReadTime);
+            } while (sync < count * threadsCount && DateTime.UtcNow - dateTimeStart < maxReadTime);
 
-            Assert.AreEqual(count * 3, resultEntities.Length);
+            Assert.AreEqual(count * threadsCount, resultEntities.Length);
             var idsBefore = writtenList.Select(x => x.Id);
             var idsAfter = resultEntities.Select(x => x.Id);
             CollectionAssert.AreEquivalent(idsBefore, idsAfter);
-            //TODO: Task-1. Need better client data syncrhonization. Some data can be lost if using more than one front
-            //           for (var i = 1; i < resultEntities.Length; i++)
-            //           {
-            //               Assert.IsTrue(resultEntities[i - 1].Ticks == resultEntities[i].Ticks - 1);
-            //               Assert.AreEqual(i, resultEntities[i - 1].Ticks);
-            //           }
         }
     }
 }
