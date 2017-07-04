@@ -59,9 +59,9 @@
       <Project>{dbfd3421-5e29-4aed-b490-fa3e0e8c6001}</Project>
       <Name>Mongo.Service.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Mongo.Service.Types\Mongo.Service.Types.csproj">
+    <ProjectReference Include="..\Mongo.Service.Core.Types\Mongo.Service.Core.Types.csproj">
       <Project>{f5d4126c-d80f-4997-9de4-56c716dfa3f9}</Project>
-      <Name>Mongo.Service.Types</Name>
+      <Name>Mongo.Service.Core.Types</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

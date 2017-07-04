@@ -3,7 +3,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storable.Indexes;
-using Mongo.Service.Core.Storable.System;
 using Mongo.Service.Core.Extensions;
 using MongoDB.Driver;
 
@@ -11,15 +10,9 @@ namespace Mongo.Service.Core.Storage
 {
     public class EntityStorage<TEntity> : IEntityStorage<TEntity> where TEntity : IBaseEntity
     {
-        private readonly IMongoCollection<CounterEntity> syncCollection;
-        private readonly string collectionName;
-        private readonly object storageLocker;
-
         public EntityStorage(IMongoStorage mongoStorage, IIndexes<TEntity> indexes)
         {
-            Collection = mongoStorage.GetCollection<TEntity>(out collectionName);
-            syncCollection = mongoStorage.GetSyncCollection();
-            storageLocker = new object();
+            Collection = mongoStorage.GetCollection<TEntity>();
             indexes.CreateIndexes(Collection);
         }
 
@@ -84,13 +77,13 @@ namespace Mongo.Service.Core.Storage
 
             Expression<Func<TEntity, bool>> newFilter = x => !x.IsDeleted && x.Ticks > lastSync && x.Ticks <= newLastSync;
             Expression<Func<TEntity, bool>> deletedFilter = x => x.IsDeleted && x.Ticks > lastSync && x.Ticks <= newLastSync;
-            
+
             if (additionalFilter != null)
             {
                 newFilter = newFilter.And(additionalFilter);
                 deletedFilter = deletedFilter.And(additionalFilter);
             }
-            
+
             newData = Read(newFilter);
             deletedData = Read(deletedFilter);
 
@@ -118,12 +111,8 @@ namespace Mongo.Service.Core.Storage
                 }
             }
             entity.LastModified = DateTime.UtcNow;
-            lock (storageLocker)
-            {
-                //TODO: Task-1. Need better client data syncrhonization. Some data can be lost if using more than one front
-                entity.Ticks = SafeGetIncrementedTick();
-                Collection.ReplaceOne(x => x.Id == entity.Id, entity, new UpdateOptions { IsUpsert = true });
-            }
+
+            TryWriteSyncedEntity(entity);
         }
 
         public void Write(TEntity[] entities)
@@ -179,30 +168,28 @@ namespace Mongo.Service.Core.Storage
             var result = Collection.Find(FilterDefinition<TEntity>.Empty).Sort(sort).Limit(1).ToList();
             return result.Count == 0 ? 0 : result[0].Ticks;
         }
-
-        private long SafeGetIncrementedTick()
+        
+        private void TryWriteSyncedEntity(TEntity entity)
         {
-            if (syncCollection.FindSync(x => x.Id == collectionName).FirstOrDefault() == null)
+            for (var i = 0; i < 100; i++)
             {
+                entity.Ticks = GetLastTick() + 1;
+
                 try
                 {
-                    syncCollection.InsertOne(new CounterEntity { Id = collectionName, CurrentTicks = 1 });
-                    return 1;
+                    Collection.ReplaceOne(x => x.Id == entity.Id, entity, new UpdateOptions { IsUpsert = true });
+                    return;
                 }
-                catch
+                catch (MongoWriteException exception)
                 {
-                    return IncrementTick();
+                    if (exception.WriteError.Category != ServerErrorCategory.DuplicateKey)
+                    {
+                        throw;
+                    }
                 }
             }
-            return IncrementTick();
-        }
 
-        private long IncrementTick()
-        {
-            var filter = Builders<CounterEntity>.Filter.Eq(x => x.Id, collectionName);
-            var update = Builders<CounterEntity>.Update.Inc(x => x.CurrentTicks, 1);
-            var updateResult = syncCollection.FindOneAndUpdate(filter, update);
-            return updateResult.CurrentTicks + 1;
+            throw new Exception("Write tries limit exceeded.");
         }
     }
 }

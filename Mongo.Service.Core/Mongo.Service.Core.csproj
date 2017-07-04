@@ -111,7 +111,6 @@
     <Compile Include="Storable\Indexes\IIndexes.cs" />
     <Compile Include="Storable\Indexes\Indexes.cs" />
     <Compile Include="Storable\SampleEntity.cs" />
-    <Compile Include="Storable\System\CounterEntity.cs" />
     <Compile Include="Storage\CollectionNameAttribute.cs" />
     <Compile Include="Storage\EntityStorage.cs" />
     <Compile Include="Storage\IEntityStorage.cs" />
@@ -131,9 +130,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Mongo.Service.Types\Mongo.Service.Types.csproj">
+    <ProjectReference Include="..\Mongo.Service.Core.Types\Mongo.Service.Core.Types.csproj">
       <Project>{f5d4126c-d80f-4997-9de4-56c716dfa3f9}</Project>
-      <Name>Mongo.Service.Types</Name>
+      <Name>Mongo.Service.Core.Types</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

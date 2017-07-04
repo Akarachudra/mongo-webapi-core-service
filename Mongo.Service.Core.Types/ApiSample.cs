@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
-using Mongo.Service.Types.Base;
+using Mongo.Service.Core.Types.Base;
 
-namespace Mongo.Service.Types
+namespace Mongo.Service.Core.Types
 {
     [DataContract]
     public class ApiSample : ApiBase

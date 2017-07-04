@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Web.Http;
 using Mongo.Service.Core.Services;
 using Mongo.Service.Core.Storable;
-using Mongo.Service.Types;
+using Mongo.Service.Core.Types;
 
 namespace Mongo.Service.Core.Controllers
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mongo.Service.Types.Base
+namespace Mongo.Service.Core.Types.Base
 {
     public abstract class ApiBase : IApiBase
     {

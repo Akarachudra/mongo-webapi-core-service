@@ -4,10 +4,9 @@ using Mongo.Service.Core.Services;
 using Mongo.Service.Core.Services.Converters;
 using Mongo.Service.Core.Storable;
 using Mongo.Service.Core.Storable.Indexes;
-using Mongo.Service.Core.Storable.System;
 using Mongo.Service.Core.Storage;
 using Mongo.Service.Core.Tests.Helpers;
-using Mongo.Service.Types;
+using Mongo.Service.Core.Types;
 using NUnit.Framework;
 
 namespace Mongo.Service.Core.Tests
@@ -29,7 +28,6 @@ namespace Mongo.Service.Core.Tests
         [SetUp]
         public void RunBeforeAnyTest()
         {
-            mongoStorage.DropCollection<CounterEntity>();
             mongoStorage.DropCollection<SampleEntity>();
         }
 

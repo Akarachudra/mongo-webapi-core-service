@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mongo.Service.Core.Storable.Base;
-using Mongo.Service.Types.Base;
+using Mongo.Service.Core.Types.Base;
 
 namespace Mongo.Service.Core.Services.Converters
 {
