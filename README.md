@@ -1,5 +1,5 @@
 # Mongo.Service.Core
-Mongo.Service.Core designed for the rapid implementation your own RESTFull service based on ASP.NET WebApi and Owin Self Host.
+Mongo.Service.Core designed for the rapid implementation your own scalable RESTFull service based on ASP.NET WebApi and Owin Self Host.
 It uses MongoDB as a data store. Timeline (reading new, deleted and changed data from client) implementation based on optimistic loop.
 
 Some other features:
