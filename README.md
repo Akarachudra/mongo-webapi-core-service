@@ -106,7 +106,7 @@ namespace Mongo.Service.Core.Controllers
             ApiSample[] newData;
             Guid[] deletedIds;
             
-            // Syncrhonize client data with ticks. Client will get only new data
+            // Synchronize client data with ticks. Client will get only new data
             var newSync = service.ReadSyncedData(lastSync, out newData, out deletedIds);
 
             var apiSync = new ApiSync<ApiSample>
@@ -139,4 +139,4 @@ private static void ConfigureContainer(Container container)
 
 You may need to other changes:
 * Implement your custom indexes. Just create new class inherited from Indexes and override CreateIndexes method. But please, don't forget to call base method in overrided, otherwise - data synchronization will work incorrect.
-* Implement your custom EntityService and override read/write methods. May be helpfull if you need write or read several entity types simultaneously.
+* Implement your custom EntityService and override read/write methods. May be helpfull if you need write or read custom entity data.
