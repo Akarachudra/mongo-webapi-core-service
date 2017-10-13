@@ -10,6 +10,8 @@ namespace Mongo.Service.Core.Storage
 {
     public class EntityStorage<TEntity> : IEntityStorage<TEntity> where TEntity : IBaseEntity
     {
+        private const int TicksWriteTries = 100;
+
         public EntityStorage(IMongoStorage mongoStorage, IIndexes<TEntity> indexes)
         {
             Collection = mongoStorage.GetCollection<TEntity>();
@@ -17,6 +19,7 @@ namespace Mongo.Service.Core.Storage
         }
 
         public IMongoCollection<TEntity> Collection { get; }
+        public UpdateDefinitionBuilder<TEntity> Updater => Builders<TEntity>.Update;
 
         public TEntity Read(Guid id)
         {
@@ -168,10 +171,61 @@ namespace Mongo.Service.Core.Storage
             var result = Collection.Find(FilterDefinition<TEntity>.Empty).Sort(sort).Limit(1).ToList();
             return result.Count == 0 ? 0 : result[0].Ticks;
         }
-        
+
+        public void UpdateTicks(Guid id)
+        {
+            for (var i = 0; i < TicksWriteTries; i++)
+            {
+                try
+                {
+                    var lastTicks = GetLastTick() + 1;
+                    var updateTicks = Builders<TEntity>.Update.Set(x => x.Ticks, lastTicks);
+                    Collection.UpdateOne(x => x.Id == id, updateTicks);
+                    return;
+                }
+                catch (MongoWriteException exception)
+                {
+                    if (exception.WriteError.Category != ServerErrorCategory.DuplicateKey)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            throw new Exception($"Update ticks tries of {nameof(TEntity)} limit exceeded");
+        }
+
+        public void Update(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition)
+        {
+            Collection.UpdateOne(filter, updateDefinition);
+        }
+
+        public void UpdateWithTicks(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition)
+        {
+            for (var i = 0; i < TicksWriteTries; i++)
+            {
+                try
+                {
+                    var lastTicks = GetLastTick() + 1;
+                    var updateWithTicks = updateDefinition.Set(x => x.Ticks, lastTicks);
+                    Collection.UpdateOne(filter, updateWithTicks);
+                    return;
+                }
+                catch (MongoWriteException exception)
+                {
+                    if (exception.WriteError.Category != ServerErrorCategory.DuplicateKey)
+                    {
+                        throw;
+                    }
+                }
+            }
+
+            throw new Exception($"Update with ticks tries of {nameof(TEntity)} limit exceeded");
+        }
+
         private void TryWriteSyncedEntity(TEntity entity)
         {
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < TicksWriteTries; i++)
             {
                 entity.Ticks = GetLastTick() + 1;
 

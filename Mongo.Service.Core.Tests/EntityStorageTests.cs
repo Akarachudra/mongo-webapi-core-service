@@ -23,7 +23,7 @@ namespace Mongo.Service.Core.Tests
         [SetUp]
         public void RunBeforeAnyTest()
         {
-            mongoStorage.DropCollection<SampleEntity>();
+            mongoStorage.ClearCollection<SampleEntity>();
             storage = new EntityStorage<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
         }
 
@@ -416,6 +416,61 @@ namespace Mongo.Service.Core.Tests
 
             Assert.AreEqual(1, entities.Length);
             Assert.AreEqual(2, sync);
+        }
+
+        [Test]
+        public void CanUpdateTicksOnly()
+        {
+            var entity = new SampleEntity
+            {
+                Id = Guid.NewGuid()
+            };
+            storage.Write(entity);
+            var readedEntity = storage.Read(entity.Id);
+            var ticksBefore = readedEntity.Ticks;
+            storage.UpdateTicks(entity.Id);
+            readedEntity = storage.Read(entity.Id);
+            Assert.AreEqual(ticksBefore + 1, readedEntity.Ticks);
+        }
+
+        [Test]
+        public void CanUpdateEntityFieldsWithoutTicks()
+        {
+            const string dataAfter = "data after";
+            var entity = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "data before"
+            };
+            storage.Write(entity);
+            var readedEntity = storage.Read(entity.Id);
+            var ticksBefore = readedEntity.Ticks;
+            var updater = storage.Updater;
+            var updateDefinition = updater.Set(x => x.SomeData, dataAfter);
+            storage.Update(x => x.Id == entity.Id, updateDefinition);
+            readedEntity = storage.Read(entity.Id);
+            Assert.AreEqual(ticksBefore, readedEntity.Ticks);
+            Assert.AreEqual(dataAfter, readedEntity.SomeData);
+        }
+
+        [Test]
+        public void CanUpdateEntityFieldsWitTicks()
+        {
+            const string dataAfter = "data after";
+            var entity = new SampleEntity
+            {
+                Id = Guid.NewGuid(),
+                SomeData = "data before"
+            };
+            storage.Write(entity);
+            var readedEntity = storage.Read(entity.Id);
+            var ticksBefore = readedEntity.Ticks;
+            var updater = storage.Updater;
+            var updateDefinition = updater.Set(x => x.SomeData, dataAfter);
+            storage.UpdateWithTicks(x => x.Id == entity.Id, updateDefinition);
+            readedEntity = storage.Read(entity.Id);
+            Assert.AreEqual(ticksBefore + 1, readedEntity.Ticks);
+            Assert.AreEqual(dataAfter, readedEntity.SomeData);
         }
 
         [Test]

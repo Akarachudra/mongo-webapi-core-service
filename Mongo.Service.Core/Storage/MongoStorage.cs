@@ -49,9 +49,14 @@ namespace Mongo.Service.Core.Storage
             return database.GetCollection<TEntity>(collectionName);
         }
 
-        public void DropCollection<T>()
+        public void DropCollection<TEntity>() where TEntity : IBaseEntity
         {
-            database.DropCollection(GetCollectionName(typeof(T)));
+            database.DropCollection(GetCollectionName(typeof(TEntity)));
+        }
+
+        public void ClearCollection<TEntity>() where TEntity : IBaseEntity
+        {
+            GetCollection<TEntity>().DeleteMany(FilterDefinition<TEntity>.Empty);
         }
 
         private static string GetCollectionName(Type type)
