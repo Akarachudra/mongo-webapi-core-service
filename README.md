@@ -51,23 +51,23 @@ namespace Mongo.Service.Core.Services.Mapping
 {
     public class Mapper<TApi, TEntity> : IMapper<TApi, TEntity> where TEntity : IBaseEntity where TApi : IApiBase
     {
-		// Some another basic implementation
+        // Some another basic implementation
 		
-		// Override this
+	// Override this
         protected virtual IMapper ConfigureApiToEntityMapper()
         {
             var toEntityMapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TApi, TEntity>());
             return toEntityMapperConfig.CreateMapper();
         }
 
-		// And this
+	// And this
         protected virtual IMapper ConfigureEntityToApiMapper()
         {
             var toApiMapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TEntity, TApi>());
             return toApiMapperConfig.CreateMapper();
         }
 		
-		// Some another basic implementation
+	// Some another basic implementation
     }
 }
 ```
@@ -135,6 +135,8 @@ private static void ConfigureContainer(Container container)
     container.RegisterSingleton<IMongoSettings, MongoSettings>();
     container.RegisterSingleton<IEntityStorage<SampleEntity>, EntityStorage<SampleEntity>>();
     container.RegisterSingleton<IIndexes<SampleEntity>, Indexes<SampleEntity>>();
+    container.RegisterSingleton<IEntityService<ApiSample, SampleEntity>, EntityService<ApiSample, SampleEntity>>();
+    container.RegisterSingleton<IMapper<ApiSample, SampleEntity>, Mapper<ApiSample, SampleEntity>>();
 }
 ```
 
