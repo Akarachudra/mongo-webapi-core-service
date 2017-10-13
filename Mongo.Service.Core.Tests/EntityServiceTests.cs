@@ -21,8 +21,8 @@ namespace Mongo.Service.Core.Tests
         {
             mongoStorage = new MongoStorage(new MongoSettings());
             var storage = new EntityStorage<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
-            var converter = new SampleConverter();
-            service = new EntityService<ApiSample, SampleEntity>(storage, converter);
+            var mapper = new Mapper<ApiSample, SampleEntity>();
+            service = new EntityService<ApiSample, SampleEntity>(storage, mapper);
         }
 
         [SetUp]

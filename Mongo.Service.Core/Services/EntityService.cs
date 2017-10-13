@@ -10,12 +10,12 @@ namespace Mongo.Service.Core.Services
 {
     public class EntityService<TApi, TEntity> : IEntityService<TApi, TEntity> where TApi : IApiBase where TEntity : IBaseEntity
     {
-        private readonly IConverter<TApi, TEntity> converter;
+        private readonly IMapper<TApi, TEntity> mapper;
 
-        public EntityService(IEntityStorage<TEntity> storage, IConverter<TApi, TEntity> converter)
+        public EntityService(IEntityStorage<TEntity> storage, IMapper<TApi, TEntity> mapper)
         {
             Storage = storage;
-            this.converter = converter;
+            this.mapper = mapper;
         }
         
         public IEntityStorage<TEntity> Storage { get; }
@@ -23,7 +23,7 @@ namespace Mongo.Service.Core.Services
         public virtual TApi Read(Guid id)
         {
             var entity = Storage.Read(id);
-            return converter.GetApiFromStorable(entity);
+            return mapper.GetApiFromEntity(entity);
         }
 
         public virtual bool TryRead(Guid id, out TApi apiEntity)
@@ -32,7 +32,7 @@ namespace Mongo.Service.Core.Services
             var result = Storage.TryRead(id, out entity);
             if (result)
             {
-                apiEntity = converter.GetApiFromStorable(entity);
+                apiEntity = mapper.GetApiFromEntity(entity);
                 return true;
             }
             apiEntity = default(TApi);
@@ -42,25 +42,25 @@ namespace Mongo.Service.Core.Services
         public virtual TApi[] Read(int skip, int limit)
         {
             var entities = Storage.Read(skip, limit);
-            return converter.GetApiFromStorable(entities);
+            return mapper.GetApiFromEntity(entities);
         }
 
         public virtual TApi[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit)
         {
             var entities = Storage.Read(filter, skip, limit);
-            return converter.GetApiFromStorable(entities);
+            return mapper.GetApiFromEntity(entities);
         }
 
         public virtual TApi[] Read(Expression<Func<TEntity, bool>> filter)
         {
             var entities = Storage.Read(filter);
-            return converter.GetApiFromStorable(entities);
+            return mapper.GetApiFromEntity(entities);
         }
 
         public virtual TApi[] ReadAll()
         {
             var entities = Storage.ReadAll();
-            return converter.GetApiFromStorable(entities);
+            return mapper.GetApiFromEntity(entities);
         }
 
         public virtual Guid[] ReadIds(Expression<Func<TEntity, bool>> filter)
@@ -76,7 +76,7 @@ namespace Mongo.Service.Core.Services
 
             var newSync = Storage.ReadSyncedData(lastSync, out newEntities, out deletedEntities, additionalFilter);
 
-            newData = converter.GetApiFromStorable(newEntities);
+            newData = mapper.GetApiFromEntity(newEntities);
             deletedData = deletedEntities.Select(x => x.Id).ToArray();
 
             return newSync;
@@ -89,7 +89,7 @@ namespace Mongo.Service.Core.Services
 
         public virtual void Write(TApi apiEntity)
         {
-            var entity = converter.GetStorableFromApi(apiEntity);
+            var entity = mapper.GetEntityFromApi(apiEntity);
             Storage.Write(entity);
         }
 
@@ -118,7 +118,7 @@ namespace Mongo.Service.Core.Services
 
         public virtual void Remove(TApi[] apiEntities)
         {
-            var entities = converter.GetStorableFromApi(apiEntities);
+            var entities = mapper.GetEntityFromApi(apiEntities);
             Storage.Remove(entities);
         }
     }
