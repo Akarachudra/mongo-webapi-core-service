@@ -6,10 +6,14 @@ namespace Mongo.Service.Core.Storable.Indexes
 {
     public class Indexes<TEntity> : IIndexes<TEntity> where TEntity : IBaseEntity
     {
-        public virtual void CreateIndexes(IMongoCollection<TEntity> collection)
+        public void CreateIndexes(IMongoCollection<TEntity> collection)
         {
             collection.Indexes.CreateOne(new BsonDocumentIndexKeysDefinition<TEntity>(new BsonDocument()).Descending(x => x.Ticks),
                                          new CreateIndexOptions { Background = true, Unique = true });
+        }
+
+        protected virtual void CreateCustomIndexes(IMongoCollection<TEntity> collection)
+        {
         }
     }
 }

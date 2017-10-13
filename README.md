@@ -141,5 +141,5 @@ private static void ConfigureContainer(Container container)
 ```
 
 You may need to other changes:
-* Implement your custom indexes. Just create new class inherited from Indexes and override CreateIndexes method. But please, don't forget to call base method in overrided, otherwise - data synchronization will work incorrect.
+* Implement your custom indexes. Just create new class inherited from Indexes and override CreateCustomIndexes method.
 * Implement your custom EntityService and override read/write methods. May be helpfull if you need write or read custom entity data.
