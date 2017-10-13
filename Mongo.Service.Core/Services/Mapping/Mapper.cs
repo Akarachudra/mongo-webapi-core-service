@@ -4,7 +4,7 @@ using AutoMapper;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Types.Base;
 
-namespace Mongo.Service.Core.Services.Converters
+namespace Mongo.Service.Core.Services.Mapping
 {
     public class Mapper<TApi, TEntity> : IMapper<TApi, TEntity> where TEntity : IBaseEntity where TApi : IApiBase
     {
