@@ -23,7 +23,7 @@ namespace Mongo.Service.Core.Tests
         [SetUp]
         public void RunBeforeAnyTest()
         {
-            mongoStorage.DropCollection<SampleEntity>();
+            mongoStorage.ClearCollection<SampleEntity>();
             storage = new EntityStorage<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
         }
 

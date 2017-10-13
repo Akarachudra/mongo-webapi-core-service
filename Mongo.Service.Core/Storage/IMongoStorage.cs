@@ -6,6 +6,7 @@ namespace Mongo.Service.Core.Storage
     public interface IMongoStorage
     {
         IMongoCollection<TEntity> GetCollection<TEntity>() where TEntity : IBaseEntity;
-        void DropCollection<T>();
+        void DropCollection<TEntity>() where TEntity : IBaseEntity;
+        void ClearCollection<TEntity>() where TEntity : IBaseEntity;
     }
 }
