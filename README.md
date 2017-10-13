@@ -4,6 +4,7 @@ It uses MongoDB as a data store. Timeline (reading new, deleted and changed data
 
 Some other features:
 * TopShelf for run as Windows Service.
+* Automapper for entities mapping.
 * DI Container - Simple Injector.
 
 ## How to use
