@@ -42,33 +42,32 @@ namespace Mongo.Service.Core.Storable
 }
 ```
 
-Implement converter for converting ApiType and EntityType in both ways:
+Implement custom Automapper mapping configuration if default is not enough:
 ```c#
 using Mongo.Service.Core.Storable;
 using Mongo.Service.Core.Types;
 
-namespace Mongo.Service.Core.Services.Converters
+namespace Mongo.Service.Core.Services.Mapping
 {
-    // Inherited from base generic Converter class
-    public class SampleConverter : Converter<ApiSample, SampleEntity>
+    public class Mapper<TApi, TEntity> : IMapper<TApi, TEntity> where TEntity : IBaseEntity where TApi : IApiBase
     {
-        public override ApiSample GetApiFromStorable(SampleEntity source)
+		// Some another basic implementation
+		
+		// Override this
+        protected virtual IMapper ConfigureApiToEntityMapper()
         {
-            return new ApiSample
-            {
-                Id = source.Id,
-                SomeData = source.SomeData
-            };
+            var toEntityMapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TApi, TEntity>());
+            return toEntityMapperConfig.CreateMapper();
         }
 
-        public override SampleEntity GetStorableFromApi(ApiSample source)
+		// And this
+        protected virtual IMapper ConfigureEntityToApiMapper()
         {
-            return new SampleEntity
-            {
-                Id = source.Id,
-                SomeData = source.SomeData
-            };
+            var toApiMapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TEntity, TApi>());
+            return toApiMapperConfig.CreateMapper();
         }
+		
+		// Some another basic implementation
     }
 }
 ```
