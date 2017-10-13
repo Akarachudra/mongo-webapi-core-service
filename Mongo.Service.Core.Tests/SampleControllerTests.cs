@@ -2,7 +2,7 @@
 using System.Linq;
 using Mongo.Service.Core.Controllers;
 using Mongo.Service.Core.Services;
-using Mongo.Service.Core.Services.Converters;
+using Mongo.Service.Core.Services.Mapping;
 using Mongo.Service.Core.Storable;
 using Mongo.Service.Core.Storable.Indexes;
 using Mongo.Service.Core.Storage;
