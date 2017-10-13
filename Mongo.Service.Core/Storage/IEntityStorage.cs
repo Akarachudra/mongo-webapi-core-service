@@ -8,6 +8,7 @@ namespace Mongo.Service.Core.Storage
     public interface IEntityStorage<TEntity> where TEntity : IBaseEntity
     {
         IMongoCollection<TEntity> Collection { get; }
+        UpdateDefinitionBuilder<TEntity> Updater { get; }
         TEntity Read(Guid id);
         TEntity[] Read(Expression<Func<TEntity, bool>> filter);    
         TEntity[] Read(int skip, int limit);
@@ -26,6 +27,9 @@ namespace Mongo.Service.Core.Storage
         void Remove(TEntity[] entities);
         long Count();
         long Count(Expression<Func<TEntity, bool>> filter);
-        long GetLastTick();       
+        long GetLastTick();
+        void UpdateTicks(Guid id);
+        void Update(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition);
+        void UpdateWithTicks(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition);
     }
 }
