@@ -17,7 +17,7 @@ namespace Mongo.Service.Core.Tests
 
         public EntityStorageTests()
         {
-            mongoStorage = new MongoStorage(new MongoSettings());  
+            mongoStorage = new MongoStorage(new MongoSettings());
         }
 
         [SetUp]
@@ -217,10 +217,10 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid(),
                 SomeData = "testData"
             };
-            
+
             storage.Write(entity);
             storage.Remove(entity);
-            
+
             storage.Write(entity);
             var readedEntity = storage.Read(entity.Id);
             Assert.IsTrue(readedEntity.IsDeleted);
