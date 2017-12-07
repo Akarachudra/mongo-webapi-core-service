@@ -31,7 +31,7 @@ namespace Mongo.Service.Core.Tests
         {
             mongoStorage.ClearCollection<SampleEntity>();
         }
-        
+
         [Test]
         public void CanGetAll()
         {
@@ -51,7 +51,7 @@ namespace Mongo.Service.Core.Tests
             var sampleController = new SampleController(service);
             var resultEntities = sampleController.GetAll().ToArray();
             Assert.AreEqual(0, resultEntities.Length);
-            
+
             service.Write(apiEntities);
             var resultIds = sampleController.GetAll().Select(x => x.Id).ToArray();
             CollectionAssert.AreEquivalent(idsBefore, resultIds);
@@ -64,7 +64,7 @@ namespace Mongo.Service.Core.Tests
             {
                 Id = Guid.NewGuid()
             };
-            
+
             service.Write(apiEntity);
             var sampleController = new SampleController(service);
             var resultApiEntity = sampleController.Get(apiEntity.Id);
@@ -78,7 +78,7 @@ namespace Mongo.Service.Core.Tests
             {
                 Id = Guid.NewGuid()
             };
-            
+
             var sampleController = new SampleController(service);
             sampleController.Post(apiEntity);
 
@@ -97,20 +97,20 @@ namespace Mongo.Service.Core.Tests
             {
                 Id = Guid.NewGuid()
             };
-            
+
             var sampleController = new SampleController(service);
             var apiSync = sampleController.Get(-1);
             Assert.AreEqual(0, apiSync.LastSync);
             Assert.AreEqual(0, apiSync.Data.Length);
             Assert.AreEqual(0, apiSync.DeletedData.Length);
-            
+
             service.Write(apiEntity1);
             apiSync = sampleController.Get(apiSync.LastSync);
             Assert.AreEqual(1, apiSync.LastSync);
             Assert.AreEqual(1, apiSync.Data.Length);
             Assert.AreEqual(apiEntity1.Id, apiSync.Data[0].Id);
             Assert.AreEqual(0, apiSync.DeletedData.Length);
-            
+
             service.Write(apiEntity2);
             service.Remove(apiEntity1);
             apiSync = sampleController.Get(apiSync.LastSync);

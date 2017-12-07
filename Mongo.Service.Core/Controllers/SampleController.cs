@@ -20,7 +20,7 @@ namespace Mongo.Service.Core.Controllers
         {
             return service.ReadAll();
         }
-        
+
         public ApiSample Get(Guid id)
         {
             return service.Read(id);
@@ -30,7 +30,7 @@ namespace Mongo.Service.Core.Controllers
         {
             ApiSample[] newData;
             Guid[] deletedIds;
-            
+
             var newSync = service.ReadSyncedData(lastSync, out newData, out deletedIds);
 
             var apiSync = new ApiSync<ApiSample>

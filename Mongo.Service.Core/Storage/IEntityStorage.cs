@@ -10,7 +10,7 @@ namespace Mongo.Service.Core.Storage
         IMongoCollection<TEntity> Collection { get; }
         UpdateDefinitionBuilder<TEntity> Updater { get; }
         TEntity Read(Guid id);
-        TEntity[] Read(Expression<Func<TEntity, bool>> filter);    
+        TEntity[] Read(Expression<Func<TEntity, bool>> filter);
         TEntity[] Read(int skip, int limit);
         TEntity[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit);
         bool TryRead(Guid id, out TEntity outEntity);

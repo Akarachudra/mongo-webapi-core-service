@@ -8,7 +8,7 @@
         {
             this.settings = settings;
         }
-        
+
         public void Start()
         {
             Microsoft.Owin.Hosting.WebApp.Start<Startup>($"http://+:{settings.Port}/");

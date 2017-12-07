@@ -17,9 +17,9 @@ namespace Mongo.Service.Core.Services
             Storage = storage;
             this.mapper = mapper;
         }
-        
+
         public IEntityStorage<TEntity> Storage { get; }
-        
+
         public virtual TApi Read(Guid id)
         {
             var entity = Storage.Read(id);
