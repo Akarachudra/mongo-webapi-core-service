@@ -12,27 +12,27 @@ namespace Mongo.Service.Core.Services.Mapping
     {
         public Mapper()
         {
-            ConfigureMappers();
+            this.ConfigureMappers();
         }
 
         public TApi GetApiFromEntity(TEntity source)
         {
-            return EntityToApiMapper.Map<TApi>(source);
+            return this.EntityToApiMapper.Map<TApi>(source);
         }
 
         public TEntity GetEntityFromApi(TApi source)
         {
-            return ApiToEntityMapper.Map<TEntity>(source);
+            return this.ApiToEntityMapper.Map<TEntity>(source);
         }
 
         public TEntity[] GetEntityFromApi(IEnumerable<TApi> source)
         {
-            return source.Select(GetEntityFromApi).ToArray();
+            return source.Select(this.GetEntityFromApi).ToArray();
         }
 
         public TApi[] GetApiFromEntity(IEnumerable<TEntity> source)
         {
-            return source.Select(GetApiFromEntity).ToArray();
+            return source.Select(this.GetApiFromEntity).ToArray();
         }
 
         protected virtual IMapper ConfigureApiToEntityMapper()
@@ -53,8 +53,8 @@ namespace Mongo.Service.Core.Services.Mapping
 
         private void ConfigureMappers()
         {
-            ApiToEntityMapper = ConfigureApiToEntityMapper();
-            EntityToApiMapper = ConfigureEntityToApiMapper();
+            this.ApiToEntityMapper = this.ConfigureApiToEntityMapper();
+            this.EntityToApiMapper = this.ConfigureEntityToApiMapper();
         }
     }
 }

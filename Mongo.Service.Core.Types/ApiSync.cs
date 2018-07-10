@@ -13,15 +13,15 @@ namespace Mongo.Service.Core.Types
         [DataMember]
         public TApi[] Data
         {
-            get => data ?? (data = new TApi[0]);
-            set => data = value;
+            get => this.data ?? (this.data = new TApi[0]);
+            set => this.data = value;
         }
 
         [DataMember]
         public Guid[] DeletedData
         {
-            get => deleted ?? (deleted = new Guid[0]);
-            set => deleted = value;
+            get => this.deleted ?? (this.deleted = new Guid[0]);
+            set => this.deleted = value;
         }
 
         [DataMember]

@@ -16,7 +16,7 @@ namespace Mongo.Service.Core.Services
 
         public EntityService(IMongoRepository<TEntity> storage, IMapper<TApi, TEntity> mapper)
         {
-            Storage = storage;
+            this.Storage = storage;
             this.mapper = mapper;
         }
 
@@ -24,17 +24,17 @@ namespace Mongo.Service.Core.Services
 
         public virtual TApi Read(Guid id)
         {
-            var entity = Storage.Read(id);
-            return mapper.GetApiFromEntity(entity);
+            var entity = this.Storage.Read(id);
+            return this.mapper.GetApiFromEntity(entity);
         }
 
         public virtual bool TryRead(Guid id, out TApi apiEntity)
         {
             TEntity entity;
-            var result = Storage.TryRead(id, out entity);
+            var result = this.Storage.TryRead(id, out entity);
             if (result)
             {
-                apiEntity = mapper.GetApiFromEntity(entity);
+                apiEntity = this.mapper.GetApiFromEntity(entity);
                 return true;
             }
             apiEntity = default(TApi);
@@ -43,31 +43,31 @@ namespace Mongo.Service.Core.Services
 
         public virtual TApi[] Read(int skip, int limit)
         {
-            var entities = Storage.Read(skip, limit);
-            return mapper.GetApiFromEntity(entities);
+            var entities = this.Storage.Read(skip, limit);
+            return this.mapper.GetApiFromEntity(entities);
         }
 
         public virtual TApi[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit)
         {
-            var entities = Storage.Read(filter, skip, limit);
-            return mapper.GetApiFromEntity(entities);
+            var entities = this.Storage.Read(filter, skip, limit);
+            return this.mapper.GetApiFromEntity(entities);
         }
 
         public virtual TApi[] Read(Expression<Func<TEntity, bool>> filter)
         {
-            var entities = Storage.Read(filter);
-            return mapper.GetApiFromEntity(entities);
+            var entities = this.Storage.Read(filter);
+            return this.mapper.GetApiFromEntity(entities);
         }
 
         public virtual TApi[] ReadAll()
         {
-            var entities = Storage.ReadAll();
-            return mapper.GetApiFromEntity(entities);
+            var entities = this.Storage.ReadAll();
+            return this.mapper.GetApiFromEntity(entities);
         }
 
         public virtual Guid[] ReadIds(Expression<Func<TEntity, bool>> filter)
         {
-            return Storage.ReadIds(filter);
+            return this.Storage.ReadIds(filter);
         }
 
         public virtual long ReadSyncedData(long lastSync, out TApi[] newData, out Guid[] deletedData,
@@ -76,9 +76,9 @@ namespace Mongo.Service.Core.Services
             TEntity[] newEntities;
             TEntity[] deletedEntities;
 
-            var newSync = Storage.ReadSyncedData(lastSync, out newEntities, out deletedEntities, additionalFilter);
+            var newSync = this.Storage.ReadSyncedData(lastSync, out newEntities, out deletedEntities, additionalFilter);
 
-            newData = mapper.GetApiFromEntity(newEntities);
+            newData = this.mapper.GetApiFromEntity(newEntities);
             deletedData = deletedEntities.Select(x => x.Id).ToArray();
 
             return newSync;
@@ -86,42 +86,42 @@ namespace Mongo.Service.Core.Services
 
         public virtual bool Exists(Guid id)
         {
-            return Storage.Exists(id);
+            return this.Storage.Exists(id);
         }
 
         public virtual void Write(TApi apiEntity)
         {
-            var entity = mapper.GetEntityFromApi(apiEntity);
-            Storage.Write(entity);
+            var entity = this.mapper.GetEntityFromApi(apiEntity);
+            this.Storage.Write(entity);
         }
 
         public virtual void Write(TApi[] apiEntities)
         {
             foreach (var apiEntity in apiEntities)
             {
-                Write(apiEntity);
+                this.Write(apiEntity);
             }
         }
 
         public virtual void Remove(Guid id)
         {
-            Storage.Remove(id);
+            this.Storage.Remove(id);
         }
 
         public virtual void Remove(Guid[] ids)
         {
-            Storage.Remove(ids);
+            this.Storage.Remove(ids);
         }
 
         public virtual void Remove(TApi apiEntity)
         {
-            Storage.Remove(apiEntity.Id);
+            this.Storage.Remove(apiEntity.Id);
         }
 
         public virtual void Remove(TApi[] apiEntities)
         {
-            var entities = mapper.GetEntityFromApi(apiEntities);
-            Storage.Remove(entities);
+            var entities = this.mapper.GetEntityFromApi(apiEntities);
+            this.Storage.Remove(entities);
         }
     }
 }

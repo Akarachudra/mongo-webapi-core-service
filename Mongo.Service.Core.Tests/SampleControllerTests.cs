@@ -20,16 +20,16 @@ namespace Mongo.Service.Core.Tests
 
         public SampleControllerTests()
         {
-            mongoStorage = new MongoStorage(new MongoSettings());
-            var storage = new MongoRepository<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
+            this.mongoStorage = new MongoStorage(new MongoSettings());
+            var storage = new MongoRepository<SampleEntity>(this.mongoStorage, new Indexes<SampleEntity>());
             var mapper = new Mapper<ApiSample, SampleEntity>();
-            service = new EntityService<ApiSample, SampleEntity>(storage, mapper);
+            this.service = new EntityService<ApiSample, SampleEntity>(storage, mapper);
         }
 
         [SetUp]
         public void RunBeforeAnyTest()
         {
-            mongoStorage.ClearCollection<SampleEntity>();
+            this.mongoStorage.ClearCollection<SampleEntity>();
         }
 
         [Test]
@@ -48,11 +48,11 @@ namespace Mongo.Service.Core.Tests
             };
 
             var idsBefore = apiEntities.Select(x => x.Id);
-            var sampleController = new SampleController(service);
+            var sampleController = new SampleController(this.service);
             var resultEntities = sampleController.GetAll().ToArray();
             Assert.AreEqual(0, resultEntities.Length);
 
-            service.Write(apiEntities);
+            this.service.Write(apiEntities);
             var resultIds = sampleController.GetAll().Select(x => x.Id).ToArray();
             CollectionAssert.AreEquivalent(idsBefore, resultIds);
         }
@@ -65,8 +65,8 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid()
             };
 
-            service.Write(apiEntity);
-            var sampleController = new SampleController(service);
+            this.service.Write(apiEntity);
+            var sampleController = new SampleController(this.service);
             var resultApiEntity = sampleController.Get(apiEntity.Id);
             Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, resultApiEntity));
         }
@@ -79,10 +79,10 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid()
             };
 
-            var sampleController = new SampleController(service);
+            var sampleController = new SampleController(this.service);
             sampleController.Post(apiEntity);
 
-            var readedEtity = service.Read(apiEntity.Id);
+            var readedEtity = this.service.Read(apiEntity.Id);
             Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, readedEtity));
         }
 
@@ -98,21 +98,21 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid()
             };
 
-            var sampleController = new SampleController(service);
+            var sampleController = new SampleController(this.service);
             var apiSync = sampleController.Get(-1);
             Assert.AreEqual(0, apiSync.LastSync);
             Assert.AreEqual(0, apiSync.Data.Length);
             Assert.AreEqual(0, apiSync.DeletedData.Length);
 
-            service.Write(apiEntity1);
+            this.service.Write(apiEntity1);
             apiSync = sampleController.Get(apiSync.LastSync);
             Assert.AreEqual(1, apiSync.LastSync);
             Assert.AreEqual(1, apiSync.Data.Length);
             Assert.AreEqual(apiEntity1.Id, apiSync.Data[0].Id);
             Assert.AreEqual(0, apiSync.DeletedData.Length);
 
-            service.Write(apiEntity2);
-            service.Remove(apiEntity1);
+            this.service.Write(apiEntity2);
+            this.service.Remove(apiEntity1);
             apiSync = sampleController.Get(apiSync.LastSync);
             Assert.AreEqual(3, apiSync.LastSync);
             Assert.AreEqual(1, apiSync.Data.Length);

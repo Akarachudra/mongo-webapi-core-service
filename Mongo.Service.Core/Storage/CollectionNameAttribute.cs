@@ -9,7 +9,7 @@ namespace Mongo.Service.Core.Storage
 
         public CollectionNameAttribute(string name)
         {
-            Name = name;
+            this.Name = name;
         }
     }
 }

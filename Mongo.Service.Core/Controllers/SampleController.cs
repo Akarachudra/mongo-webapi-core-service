@@ -18,12 +18,12 @@ namespace Mongo.Service.Core.Controllers
 
         public IEnumerable<ApiSample> GetAll()
         {
-            return service.ReadAll();
+            return this.service.ReadAll();
         }
 
         public ApiSample Get(Guid id)
         {
-            return service.Read(id);
+            return this.service.Read(id);
         }
 
         public ApiSync<ApiSample> Get(long lastSync)
@@ -31,7 +31,7 @@ namespace Mongo.Service.Core.Controllers
             ApiSample[] newData;
             Guid[] deletedIds;
 
-            var newSync = service.ReadSyncedData(lastSync, out newData, out deletedIds);
+            var newSync = this.service.ReadSyncedData(lastSync, out newData, out deletedIds);
 
             var apiSync = new ApiSync<ApiSample>
             {
@@ -44,7 +44,7 @@ namespace Mongo.Service.Core.Controllers
 
         public void Post(ApiSample apiSample)
         {
-            service.Write(apiSample);
+            this.service.Write(apiSample);
         }
     }
 }

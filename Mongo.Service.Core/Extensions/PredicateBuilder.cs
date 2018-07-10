@@ -34,7 +34,7 @@ namespace Mongo.Service.Core.Extensions
         protected override Expression VisitParameter(ParameterExpression node)
         {
             Expression newValue;
-            if (Subst.TryGetValue(node, out newValue))
+            if (this.Subst.TryGetValue(node, out newValue))
             {
                 return newValue;
             }

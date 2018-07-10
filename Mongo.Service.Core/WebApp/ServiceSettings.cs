@@ -6,7 +6,7 @@
 
         public ServiceSettings()
         {
-            Port = 12512;
+            this.Port = 12512;
         }
     }
 }

@@ -6,8 +6,8 @@ namespace Mongo.Service.Core.Storage
     {
         public MongoSettings()
         {
-            MongoDatabaseName = "MongoServiceCore";
-            MongoServers = new[] { new MongoServerAddress("localhost", 27017) };
+            this.MongoDatabaseName = "MongoServiceCore";
+            this.MongoServers = new[] { new MongoServerAddress("localhost", 27017) };
         }
 
         public MongoServerAddress[] MongoServers { get; set; }
