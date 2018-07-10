@@ -72,39 +72,39 @@ namespace Mongo.Service.Core.Services
             return this.Repository.Exists(id);
         }
 
-        public virtual void Write(TApi apiEntity)
+        public virtual async Task WriteAsync(TApi apiEntity)
         {
             var entity = this.mapper.GetEntityFromApi(apiEntity);
-            this.Repository.Write(entity);
+            await this.Repository.WriteAsync(entity).ConfigureAwait(false);
         }
 
-        public virtual void Write(TApi[] apiEntities)
+        public virtual async Task WriteAsync(IEnumerable<TApi> apiEntities)
         {
             foreach (var apiEntity in apiEntities)
             {
-                this.Write(apiEntity);
+                await this.WriteAsync(apiEntity).ConfigureAwait(false);
             }
         }
 
-        public virtual void Remove(Guid id)
+        public virtual async Task RemoveAsync(Guid id)
         {
-            this.Repository.RemoveAsync(id);
+            await this.Repository.RemoveAsync(id).ConfigureAwait(false);
         }
 
-        public virtual void Remove(Guid[] ids)
+        public virtual async Task RemoveAsync(IEnumerable<Guid> ids)
         {
-            this.Repository.RemoveAsync(ids);
+            await this.Repository.RemoveAsync(ids).ConfigureAwait(false);
         }
 
-        public virtual void Remove(TApi apiEntity)
+        public virtual async Task RemoveAsync(TApi apiEntity)
         {
-            this.Repository.RemoveAsync(apiEntity.Id);
+            await this.Repository.RemoveAsync(apiEntity.Id).ConfigureAwait(false);
         }
 
-        public virtual void Remove(TApi[] apiEntities)
+        public virtual async Task RemoveAsync(IEnumerable<TApi> apiEntities)
         {
             var entities = this.mapper.GetEntityFromApi(apiEntities);
-            this.Repository.RemoveAsync(entities);
+            await this.Repository.RemoveAsync(entities).ConfigureAwait(false);
         }
     }
 }

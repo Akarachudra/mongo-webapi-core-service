@@ -35,7 +35,7 @@ namespace Mongo.Service.Core.Controllers
 
         public void Post(ApiSample apiSample)
         {
-            this.service.Write(apiSample);
+            this.service.WriteAsync(apiSample);
         }
     }
 }

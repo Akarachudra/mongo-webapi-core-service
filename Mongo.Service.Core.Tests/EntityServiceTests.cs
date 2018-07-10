@@ -40,7 +40,7 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "test"
             };
 
-            this.service.Write(apiEntity);
+            this.service.WriteAsync(apiEntity);
             var readedApiEntity = this.service.ReadAsync(apiEntity.Id);
 
             Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, readedApiEntity));
@@ -63,7 +63,7 @@ namespace Mongo.Service.Core.Tests
                 }
             };
 
-            this.service.Write(apiEntities);
+            this.service.WriteAsync(apiEntities);
 
             var readedApiEntities = this.service.ReadAsync(x => x.SomeData == "testData1").Result;
             Assert.AreEqual(1, readedApiEntities.Count);
@@ -79,7 +79,7 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "test"
             };
 
-            this.service.Write(apiEntity);
+            this.service.WriteAsync(apiEntity);
             Assert.IsTrue(this.service.Exists(apiEntity.Id));
             Assert.IsFalse(this.service.Exists(Guid.NewGuid()));
         }
@@ -102,7 +102,7 @@ namespace Mongo.Service.Core.Tests
             };
 
             var anonymousBefore = apiEntities.Select(x => new { x.Id, x.SomeData });
-            this.service.Write(apiEntities);
+            this.service.WriteAsync(apiEntities);
             var readedAllApiEntities = this.service.ReadAllAsync().Result;
             var anonymousAfter = readedAllApiEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousBefore, anonymousAfter);
@@ -134,7 +134,7 @@ namespace Mongo.Service.Core.Tests
                     SomeData = "3"
                 }
             };
-            this.service.Write(apiEntities);
+            this.service.WriteAsync(apiEntities);
 
             var anonymousEntitiesBefore = apiEntities.Select(x => new { x.Id, x.SomeData }).Take(2);
             var readedEntities = this.service.ReadAsync(0, 2).Result;
@@ -176,13 +176,13 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "testData"
             };
 
-            this.service.Write(apiEntity1);
-            this.service.Remove(apiEntity1);
+            this.service.WriteAsync(apiEntity1);
+            this.service.RemoveAsync(apiEntity1);
             var readedEntities = this.service.ReadAsync(x => !x.IsDeleted).Result;
             Assert.AreEqual(0, readedEntities.Count);
 
-            this.service.Write(new[] { apiEntity2, apiEntity3 });
-            this.service.Remove(new[] { apiEntity2, apiEntity3 });
+            this.service.WriteAsync(new[] { apiEntity2, apiEntity3 });
+            this.service.RemoveAsync(new[] { apiEntity2, apiEntity3 });
             readedEntities = this.service.ReadAsync(x => !x.IsDeleted).Result;
             Assert.AreEqual(0, readedEntities.Count);
         }
@@ -198,13 +198,13 @@ namespace Mongo.Service.Core.Tests
             {
                 Id = Guid.NewGuid()
             };
-            this.service.Write(apiEntity1);
+            this.service.WriteAsync(apiEntity1);
 
             var apiEntity2 = new ApiSample
             {
                 Id = Guid.NewGuid()
             };
-            this.service.Write(apiEntity2);
+            this.service.WriteAsync(apiEntity2);
 
             apiSync = this.service.ReadSyncedDataAsync(apiSync.LastSync).Result;
 
@@ -216,7 +216,7 @@ namespace Mongo.Service.Core.Tests
 
             Assert.AreEqual(previousSync, apiSync.LastSync);
 
-            this.service.Remove(apiEntity2);
+            this.service.RemoveAsync(apiEntity2);
             apiSync = this.service.ReadSyncedDataAsync(apiSync.LastSync).Result;
             Assert.AreEqual(1, apiSync.DeletedData.Length);
             Assert.AreEqual(3, apiSync.LastSync);
@@ -230,14 +230,14 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid(),
                 SomeData = "1"
             };
-            this.service.Write(apiEntity1);
+            this.service.WriteAsync(apiEntity1);
 
             var apiEntity2 = new ApiSample
             {
                 Id = Guid.NewGuid(),
                 SomeData = "2"
             };
-            this.service.Write(apiEntity2);
+            this.service.WriteAsync(apiEntity2);
 
             var apiSync = this.service.ReadSyncedDataAsync(0, x => x.SomeData == "2").Result;
 

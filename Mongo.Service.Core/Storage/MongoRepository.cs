@@ -89,7 +89,7 @@ namespace Mongo.Service.Core.Storage
             return this.Collection.FindSync(x => x.Id == id).FirstOrDefault() != null;
         }
 
-        public void Write(TEntity entity)
+        public async Task WriteAsync(TEntity entity)
         {
             if (entity.Id == Guid.Empty)
             {
@@ -97,7 +97,7 @@ namespace Mongo.Service.Core.Storage
             }
             else
             {
-                var currentEntity = this.ReadAsync(x => x.Id == entity.Id).Result.FirstOrDefault();
+                var currentEntity = (await this.ReadAsync(x => x.Id == entity.Id).ConfigureAwait(false)).FirstOrDefault();
                 if (currentEntity != null && currentEntity.IsDeleted)
                 {
                     entity.IsDeleted = true;
@@ -109,11 +109,11 @@ namespace Mongo.Service.Core.Storage
             this.TryWriteSyncedEntity(entity);
         }
 
-        public void Write(TEntity[] entities)
+        public async Task WriteAsync(IEnumerable<TEntity> entities)
         {
             foreach (var entity in entities)
             {
-                this.Write(entity);
+                await this.WriteAsync(entity).ConfigureAwait(false);
             }
         }
 
@@ -122,27 +122,27 @@ namespace Mongo.Service.Core.Storage
             var entity = await this.ReadAsync(id).ConfigureAwait(false);
             entity.IsDeleted = true;
 
-            this.Write(entity);
+            await this.WriteAsync(entity).ConfigureAwait(false);
         }
 
-        public void RemoveAsync(Guid[] ids)
+        public async Task RemoveAsync(IEnumerable<Guid> ids)
         {
             foreach (var id in ids)
             {
-                this.RemoveAsync(id);
+                await this.RemoveAsync(id).ConfigureAwait(false);
             }
         }
 
-        public void RemoveAsync(TEntity entity)
+        public async Task RemoveAsync(TEntity entity)
         {
-            this.RemoveAsync(entity.Id);
+            await this.RemoveAsync(entity.Id).ConfigureAwait(false);
         }
 
-        public void RemoveAsync(TEntity[] entities)
+        public async Task RemoveAsync(IEnumerable<TEntity> entities)
         {
             foreach (var entity in entities)
             {
-                this.RemoveAsync(entity.Id);
+                await this.RemoveAsync(entity.Id).ConfigureAwait(false);
             }
         }
 

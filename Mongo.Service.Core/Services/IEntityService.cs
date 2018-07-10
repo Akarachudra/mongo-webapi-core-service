@@ -31,16 +31,16 @@ namespace Mongo.Service.Core.Services
 
         bool Exists(Guid id);
 
-        void Write(TApi apiEntity);
+        Task WriteAsync(TApi apiEntity);
 
-        void Write(TApi[] apiEntities);
+        Task WriteAsync(IEnumerable<TApi> apiEntities);
 
-        void Remove(Guid id);
+        Task RemoveAsync(Guid id);
 
-        void Remove(Guid[] ids);
+        Task RemoveAsync(IEnumerable<Guid> ids);
 
-        void Remove(TApi apiEntity);
+        Task RemoveAsync(TApi apiEntity);
 
-        void Remove(TApi[] apiEntities);
+        Task RemoveAsync(IEnumerable<TApi> apiEntities);
     }
 }

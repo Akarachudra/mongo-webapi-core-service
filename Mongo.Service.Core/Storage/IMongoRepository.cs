@@ -30,17 +30,17 @@ namespace Mongo.Service.Core.Storage
 
         bool Exists(Guid id);
 
-        void Write(TEntity entity);
+        Task WriteAsync(TEntity entity);
 
-        void Write(TEntity[] entities);
+        Task WriteAsync(IEnumerable<TEntity> entities);
 
         Task RemoveAsync(Guid id);
 
-        void RemoveAsync(Guid[] ids);
+        Task RemoveAsync(IEnumerable<Guid> ids);
 
-        void RemoveAsync(TEntity entity);
+        Task RemoveAsync(TEntity entity);
 
-        void RemoveAsync(TEntity[] entities);
+        Task RemoveAsync(IEnumerable<TEntity> entities);
 
         long Count();
 
