@@ -159,16 +159,16 @@ namespace Mongo.Service.Core.Tests
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
 
             anonymousEntitiesBefore = entities.Where(x => x.SomeData == "3")
-                                              .Select(x => new { x.Id, x.SomeData })
-                                              .Skip(1)
-                                              .Take(1);
+                .Select(x => new { x.Id, x.SomeData })
+                .Skip(1)
+                .Take(1);
             readedEntities = this.repository.Read(x => x.SomeData == "3", 1, 1);
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
 
             anonymousEntitiesBefore = entities.Select(x => new { x.Id, x.SomeData })
-                                              .Skip(1)
-                                              .Take(2);
+                .Skip(1)
+                .Take(2);
             readedEntities = this.repository.Read(1, 2);
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
@@ -471,52 +471,6 @@ namespace Mongo.Service.Core.Tests
             readedEntity = this.repository.Read(entity.Id);
             Assert.AreEqual(ticksBefore + 1, readedEntity.Ticks);
             Assert.AreEqual(dataAfter, readedEntity.SomeData);
-        }
-
-        [Test]
-        public void TestMultithreadedSyncedWriteRead()
-        {
-            const int count = 100;
-            const int threadsCount = 5;
-            var threads = new Thread[threadsCount];
-            var resultEntities = new SampleEntity[0];
-            var writtenList = new List<SampleEntity>();
-            var syncObj = new object();
-            Action writeAction = () =>
-            {
-                for (var i = 0; i < count; i++)
-                {
-                    var entity = new SampleEntity
-                    {
-                        Id = Guid.NewGuid()
-                    };
-                    this.repository.Write(entity);
-                    lock (syncObj)
-                    {
-                        writtenList.Add(entity);
-                    }
-                }
-            };
-            for (var i = 0; i < threadsCount; i++)
-            {
-                threads[i] = new Thread(() => writeAction.Invoke());
-                threads[i].Start();
-            }
-            long sync = 0;
-            var dateTimeStart = DateTime.UtcNow;
-            var maxReadTime = TimeSpan.FromSeconds(20);
-            do
-            {
-                SampleEntity[] entities;
-                SampleEntity[] deletedEntities;
-                sync = this.repository.ReadSyncedData(sync, out entities, out deletedEntities);
-                resultEntities = resultEntities.Concat(entities).ToArray();
-            } while (sync < count * threadsCount && DateTime.UtcNow - dateTimeStart < maxReadTime);
-
-            Assert.AreEqual(count * threadsCount, resultEntities.Length);
-            var idsBefore = writtenList.Select(x => x.Id);
-            var idsAfter = resultEntities.Select(x => x.Id);
-            CollectionAssert.AreEquivalent(idsBefore, idsAfter);
         }
     }
 }

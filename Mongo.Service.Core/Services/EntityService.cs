@@ -37,6 +37,7 @@ namespace Mongo.Service.Core.Services
                 apiEntity = this.mapper.GetApiFromEntity(entity);
                 return true;
             }
+
             apiEntity = default(TApi);
             return false;
         }
@@ -70,8 +71,11 @@ namespace Mongo.Service.Core.Services
             return this.Storage.ReadIds(filter);
         }
 
-        public virtual long ReadSyncedData(long lastSync, out TApi[] newData, out Guid[] deletedData,
-                                           Expression<Func<TEntity, bool>> additionalFilter = null)
+        public virtual long ReadSyncedData(
+            long lastSync,
+            out TApi[] newData,
+            out Guid[] deletedData,
+            Expression<Func<TEntity, bool>> additionalFilter = null)
         {
             TEntity[] newEntities;
             TEntity[] deletedEntities;

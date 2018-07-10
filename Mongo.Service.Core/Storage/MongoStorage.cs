@@ -32,7 +32,8 @@ namespace Mongo.Service.Core.Storage
             {
                 mongoClientSettings.Credentials = new[]
                 {
-                    MongoCredential.CreateCredential(mongoDataBaseName,
+                    MongoCredential.CreateCredential(
+                        mongoDataBaseName,
                                                      mongoUserName,
                                                      settings.MongoPassword)
                 };
@@ -75,9 +76,11 @@ namespace Mongo.Service.Core.Storage
                         throw new ArgumentException(
                             $"There is empty collection name at {typeof(CollectionNameAttribute).Name} in {type.Name}");
                     }
+
                     return collectionName;
                 }
             }
+
             throw new ArgumentException(
                 $"There is no {typeof(CollectionNameAttribute).Name} attribute at {type.Name}");
         }

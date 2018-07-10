@@ -26,8 +26,11 @@ namespace Mongo.Service.Core.Services
 
         Guid[] ReadIds(Expression<Func<TEntity, bool>> filter);
 
-        long ReadSyncedData(long lastSync, out TApi[] newData, out Guid[] deletedData,
-                            Expression<Func<TEntity, bool>> additionalFilter = null);
+        long ReadSyncedData(
+            long lastSync,
+            out TApi[] newData,
+            out Guid[] deletedData,
+            Expression<Func<TEntity, bool>> additionalFilter = null);
 
         bool Exists(Guid id);
 

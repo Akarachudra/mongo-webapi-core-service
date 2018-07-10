@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
-using MongoDB.Driver;
 using Mongo.Service.Core.Storable.Base;
+using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storage
 {
@@ -26,7 +26,8 @@ namespace Mongo.Service.Core.Storage
 
         Guid[] ReadIds(Expression<Func<TEntity, bool>> filter);
 
-        long ReadSyncedData(long lastSync,
+        long ReadSyncedData(
+            long lastSync,
             out TEntity[] newData,
             out TEntity[] deletedData,
             Expression<Func<TEntity, bool>> additionalFilter = null);

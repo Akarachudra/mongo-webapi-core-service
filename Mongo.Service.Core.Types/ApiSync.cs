@@ -5,7 +5,8 @@ using Mongo.Service.Core.Types.Base;
 namespace Mongo.Service.Core.Types
 {
     [DataContract]
-    public class ApiSync<TApi> where TApi : IApiBase
+    public class ApiSync<TApi>
+        where TApi : IApiBase
     {
         private TApi[] data;
         private Guid[] deleted;

@@ -15,6 +15,10 @@ namespace Mongo.Service.Core.Services.Mapping
             this.ConfigureMappers();
         }
 
+        protected IMapper ApiToEntityMapper { get; set; }
+
+        protected IMapper EntityToApiMapper { get; set; }
+
         public TApi GetApiFromEntity(TEntity source)
         {
             return this.EntityToApiMapper.Map<TApi>(source);
@@ -46,10 +50,6 @@ namespace Mongo.Service.Core.Services.Mapping
             var toApiMapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TEntity, TApi>());
             return toApiMapperConfig.CreateMapper();
         }
-
-        protected IMapper ApiToEntityMapper { get; set; }
-
-        protected IMapper EntityToApiMapper { get; set; }
 
         private void ConfigureMappers()
         {

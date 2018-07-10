@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using Mongo.Service.Core.Extensions;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storable.Indexes;
-using Mongo.Service.Core.Extensions;
 using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storage
@@ -30,6 +30,7 @@ namespace Mongo.Service.Core.Storage
             {
                 throw new Exception($"{typeof(TEntity).Name} with id {id} not found");
             }
+
             return entity;
         }
 
@@ -59,6 +60,7 @@ namespace Mongo.Service.Core.Storage
                 outEntity = default(TEntity);
                 return false;
             }
+
             outEntity = entity;
             return true;
         }
@@ -75,7 +77,8 @@ namespace Mongo.Service.Core.Storage
             return ids;
         }
 
-        public long ReadSyncedData(long lastSync,
+        public long ReadSyncedData(
+            long lastSync,
             out TEntity[] newData,
             out TEntity[] deletedData,
             Expression<Func<TEntity, bool>> additionalFilter = null)
@@ -117,6 +120,7 @@ namespace Mongo.Service.Core.Storage
                     entity.IsDeleted = true;
                 }
             }
+
             entity.LastModified = DateTime.UtcNow;
 
             this.TryWriteSyncedEntity(entity);

@@ -9,7 +9,8 @@ namespace Mongo.Service.Core.Storable.Indexes
     {
         public void CreateIndexes(IMongoCollection<TEntity> collection)
         {
-            collection.Indexes.CreateOne(new BsonDocumentIndexKeysDefinition<TEntity>(new BsonDocument()).Descending(x => x.Ticks),
+            collection.Indexes.CreateOne(
+                new BsonDocumentIndexKeysDefinition<TEntity>(new BsonDocument()).Descending(x => x.Ticks),
                                          new CreateIndexOptions { Background = true, Unique = true });
             this.CreateCustomIndexes(collection);
         }

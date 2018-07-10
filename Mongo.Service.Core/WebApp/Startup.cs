@@ -30,8 +30,7 @@ namespace Mongo.Service.Core.WebApp
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+                defaults: new { id = RouteParameter.Optional });
 
             config.Services.Add(typeof(IExceptionLogger), new ExceptionLogger());
             config.DependencyResolver = new SimpleInjectorWebApiDependencyResolver(container);
