@@ -4,6 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storage;
+using Mongo.Service.Core.Types;
 using Mongo.Service.Core.Types.Base;
 
 namespace Mongo.Service.Core.Services
@@ -24,10 +25,8 @@ namespace Mongo.Service.Core.Services
 
         Task<IList<TApi>> ReadAllAsync();
 
-        long ReadSyncedData(
+        Task<ApiSync<TApi>> ReadSyncedDataAsync(
             long lastSync,
-            out TApi[] newData,
-            out Guid[] deletedData,
             Expression<Func<TEntity, bool>> additionalFilter = null);
 
         bool Exists(Guid id);

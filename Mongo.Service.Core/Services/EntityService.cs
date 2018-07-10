@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Mongo.Service.Core.Services.Mapping;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storage;
+using Mongo.Service.Core.Types;
 using Mongo.Service.Core.Types.Base;
 
 namespace Mongo.Service.Core.Services
@@ -54,21 +55,16 @@ namespace Mongo.Service.Core.Services
             return this.mapper.GetApiFromEntity(entities);
         }
 
-        public virtual long ReadSyncedData(
-            long lastSync,
-            out TApi[] newData,
-            out Guid[] deletedData,
-            Expression<Func<TEntity, bool>> additionalFilter = null)
+        public virtual async Task<ApiSync<TApi>> ReadSyncedDataAsync(long lastSync, Expression<Func<TEntity, bool>> additionalFilter = null)
         {
-            TEntity[] newEntities;
-            TEntity[] deletedEntities;
+            var apiSync = new ApiSync<TApi>();
+            var syncResult = await this.Repository.ReadSyncedDataAsync(lastSync, additionalFilter).ConfigureAwait(false);
 
-            var newSync = this.Repository.ReadSyncedData(lastSync, out newEntities, out deletedEntities, additionalFilter);
+            apiSync.LastSync = syncResult.LastSync;
+            apiSync.Data = this.mapper.GetApiFromEntity(syncResult.NewData);
+            apiSync.DeletedData = syncResult.DeletedData.Select(x => x.Id).ToArray();
 
-            newData = this.mapper.GetApiFromEntity(newEntities);
-            deletedData = deletedEntities.Select(x => x.Id).ToArray();
-
-            return newSync;
+            return apiSync;
         }
 
         public virtual bool Exists(Guid id)
@@ -92,23 +88,23 @@ namespace Mongo.Service.Core.Services
 
         public virtual void Remove(Guid id)
         {
-            this.Repository.Remove(id);
+            this.Repository.RemoveAsync(id);
         }
 
         public virtual void Remove(Guid[] ids)
         {
-            this.Repository.Remove(ids);
+            this.Repository.RemoveAsync(ids);
         }
 
         public virtual void Remove(TApi apiEntity)
         {
-            this.Repository.Remove(apiEntity.Id);
+            this.Repository.RemoveAsync(apiEntity.Id);
         }
 
         public virtual void Remove(TApi[] apiEntities)
         {
             var entities = this.mapper.GetEntityFromApi(apiEntities);
-            this.Repository.Remove(entities);
+            this.Repository.RemoveAsync(entities);
         }
     }
 }

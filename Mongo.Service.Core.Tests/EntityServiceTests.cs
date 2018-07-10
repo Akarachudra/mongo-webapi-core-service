@@ -142,16 +142,16 @@ namespace Mongo.Service.Core.Tests
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
 
             anonymousEntitiesBefore = apiEntities.Where(x => x.SomeData == "3")
-                                                 .Select(x => new { x.Id, x.SomeData })
-                                                 .Skip(1)
-                                                 .Take(1);
+                .Select(x => new { x.Id, x.SomeData })
+                .Skip(1)
+                .Take(1);
             readedEntities = this.service.ReadAsync(x => x.SomeData == "3", 1, 1).Result;
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
 
             anonymousEntitiesBefore = apiEntities.Select(x => new { x.Id, x.SomeData })
-                                                 .Skip(1)
-                                                 .Take(2);
+                .Skip(1)
+                .Take(2);
             readedEntities = this.service.ReadAsync(1, 2).Result;
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
@@ -190,11 +190,9 @@ namespace Mongo.Service.Core.Tests
         [Test]
         public void CanReadSyncedData()
         {
-            ApiSample[] apiEntities;
-            Guid[] deletedIds;
-            var sync = this.service.ReadSyncedData(0, out apiEntities, out deletedIds);
+            var apiSync = this.service.ReadSyncedDataAsync(0).Result;
 
-            Assert.AreEqual(0, sync);
+            Assert.AreEqual(0, apiSync.LastSync);
 
             var apiEntity1 = new ApiSample
             {
@@ -208,27 +206,25 @@ namespace Mongo.Service.Core.Tests
             };
             this.service.Write(apiEntity2);
 
-            sync = this.service.ReadSyncedData(sync, out apiEntities, out deletedIds);
+            apiSync = this.service.ReadSyncedDataAsync(apiSync.LastSync).Result;
 
-            Assert.AreEqual(2, apiEntities.Length);
-            Assert.AreEqual(2, sync);
+            Assert.AreEqual(2, apiSync.Data.Length);
+            Assert.AreEqual(2, apiSync.LastSync);
 
-            var previousSync = sync;
-            sync = this.service.ReadSyncedData(sync, out apiEntities, out deletedIds);
+            var previousSync = apiSync.LastSync;
+            apiSync = this.service.ReadSyncedDataAsync(apiSync.LastSync).Result;
 
-            Assert.AreEqual(previousSync, sync);
+            Assert.AreEqual(previousSync, apiSync.LastSync);
 
             this.service.Remove(apiEntity2);
-            sync = this.service.ReadSyncedData(sync, out apiEntities, out deletedIds);
-            Assert.AreEqual(1, deletedIds.Length);
-            Assert.AreEqual(3, sync);
+            apiSync = this.service.ReadSyncedDataAsync(apiSync.LastSync).Result;
+            Assert.AreEqual(1, apiSync.DeletedData.Length);
+            Assert.AreEqual(3, apiSync.LastSync);
         }
 
         [Test]
         public void CanReadSyncedDataWithFilter()
         {
-            ApiSample[] apiEntities;
-            Guid[] deletedIds;
             var apiEntity1 = new ApiSample
             {
                 Id = Guid.NewGuid(),
@@ -243,10 +239,10 @@ namespace Mongo.Service.Core.Tests
             };
             this.service.Write(apiEntity2);
 
-            var sync = this.service.ReadSyncedData(0, out apiEntities, out deletedIds, x => x.SomeData == "2");
+            var apiSync = this.service.ReadSyncedDataAsync(0, x => x.SomeData == "2").Result;
 
-            Assert.AreEqual(1, apiEntities.Length);
-            Assert.AreEqual(2, sync);
+            Assert.AreEqual(1, apiSync.Data.Length);
+            Assert.AreEqual(2, apiSync.LastSync);
         }
     }
 }

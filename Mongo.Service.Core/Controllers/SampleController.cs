@@ -27,19 +27,9 @@ namespace Mongo.Service.Core.Controllers
             return await this.service.ReadAsync(id).ConfigureAwait(false);
         }
 
-        public ApiSync<ApiSample> Get(long lastSync)
+        public async Task<ApiSync<ApiSample>> GetAsync(long lastSync)
         {
-            ApiSample[] newData;
-            Guid[] deletedIds;
-
-            var newSync = this.service.ReadSyncedData(lastSync, out newData, out deletedIds);
-
-            var apiSync = new ApiSync<ApiSample>
-            {
-                Data = newData,
-                DeletedData = deletedIds,
-                LastSync = newSync
-            };
+            var apiSync = await this.service.ReadSyncedDataAsync(lastSync).ConfigureAwait(false);
             return apiSync;
         }
 

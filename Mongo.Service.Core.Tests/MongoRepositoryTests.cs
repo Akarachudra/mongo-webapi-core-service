@@ -167,7 +167,7 @@ namespace Mongo.Service.Core.Tests
             };
 
             this.repository.Write(entity1);
-            this.repository.Remove(entity1);
+            this.repository.RemoveAsync(entity1);
 
             var readedEntity = this.repository.ReadAsync(entity1.Id).Result;
             Assert.IsTrue(readedEntity.IsDeleted);
@@ -179,7 +179,7 @@ namespace Mongo.Service.Core.Tests
             };
 
             this.repository.Write(new[] { entity2, entity3 });
-            this.repository.Remove(new[] { entity2, entity3 });
+            this.repository.RemoveAsync(new[] { entity2, entity3 });
             readedEntity = this.repository.ReadAsync(entity2.Id).Result;
             Assert.IsTrue(readedEntity.IsDeleted);
 
@@ -197,7 +197,7 @@ namespace Mongo.Service.Core.Tests
             };
 
             this.repository.Write(entity);
-            this.repository.Remove(entity);
+            this.repository.RemoveAsync(entity);
 
             this.repository.Write(entity);
             var readedEntity = this.repository.ReadAsync(entity.Id).Result;
@@ -304,11 +304,9 @@ namespace Mongo.Service.Core.Tests
         [Test]
         public void CanReadSyncedData()
         {
-            SampleEntity[] entities;
-            SampleEntity[] deletedEntities;
-            var sync = this.repository.ReadSyncedData(0, out entities, out deletedEntities);
+            var syncResult = this.repository.ReadSyncedDataAsync(0).Result;
 
-            Assert.AreEqual(0, sync);
+            Assert.AreEqual(0, syncResult.LastSync);
 
             var entity1 = new SampleEntity
             {
@@ -322,27 +320,25 @@ namespace Mongo.Service.Core.Tests
             };
             this.repository.Write(entity2);
 
-            sync = this.repository.ReadSyncedData(sync, out entities, out deletedEntities);
+            syncResult = this.repository.ReadSyncedDataAsync(syncResult.LastSync).Result;
 
-            Assert.AreEqual(2, entities.Length);
-            Assert.AreEqual(2, sync);
+            Assert.AreEqual(2, syncResult.NewData.Count);
+            Assert.AreEqual(2, syncResult.LastSync);
 
-            var previousSync = sync;
-            sync = this.repository.ReadSyncedData(sync, out entities, out deletedEntities);
+            var previousSync = syncResult.LastSync;
+            syncResult = this.repository.ReadSyncedDataAsync(syncResult.LastSync).Result;
 
-            Assert.AreEqual(previousSync, sync);
+            Assert.AreEqual(previousSync, syncResult.LastSync);
 
-            this.repository.Remove(entity2);
-            sync = this.repository.ReadSyncedData(sync, out entities, out deletedEntities);
-            Assert.AreEqual(1, deletedEntities.Length);
-            Assert.AreEqual(3, sync);
+            this.repository.RemoveAsync(entity2);
+            syncResult = this.repository.ReadSyncedDataAsync(syncResult.LastSync).Result;
+            Assert.AreEqual(1, syncResult.DeletedData.Count);
+            Assert.AreEqual(3, syncResult.LastSync);
         }
 
         [Test]
         public void CanReadSyncedDataWithFilter()
         {
-            SampleEntity[] entities;
-            SampleEntity[] deletedEntities;
             var entity1 = new SampleEntity
             {
                 Id = Guid.NewGuid(),
@@ -357,10 +353,10 @@ namespace Mongo.Service.Core.Tests
             };
             this.repository.Write(entity2);
 
-            var sync = this.repository.ReadSyncedData(0, out entities, out deletedEntities, x => x.SomeData == "2");
+            var syncResult = this.repository.ReadSyncedDataAsync(0, x => x.SomeData == "2").Result;
 
-            Assert.AreEqual(1, entities.Length);
-            Assert.AreEqual(2, sync);
+            Assert.AreEqual(1, syncResult.NewData.Count);
+            Assert.AreEqual(2, syncResult.LastSync);
         }
 
         [Test]

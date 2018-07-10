@@ -24,10 +24,8 @@ namespace Mongo.Service.Core.Storage
 
         Task<IList<TEntity>> ReadAllAsync();
 
-        long ReadSyncedData(
+        Task<SyncResult<TEntity>> ReadSyncedDataAsync(
             long lastSync,
-            out TEntity[] newData,
-            out TEntity[] deletedData,
             Expression<Func<TEntity, bool>> additionalFilter = null);
 
         bool Exists(Guid id);
@@ -36,13 +34,13 @@ namespace Mongo.Service.Core.Storage
 
         void Write(TEntity[] entities);
 
-        void Remove(Guid id);
+        Task RemoveAsync(Guid id);
 
-        void Remove(Guid[] ids);
+        void RemoveAsync(Guid[] ids);
 
-        void Remove(TEntity entity);
+        void RemoveAsync(TEntity entity);
 
-        void Remove(TEntity[] entities);
+        void RemoveAsync(TEntity[] entities);
 
         long Count();
 

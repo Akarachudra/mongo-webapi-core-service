@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Mongo.Service.Core.Extensions;
@@ -61,12 +62,11 @@ namespace Mongo.Service.Core.Storage
             return entities;
         }
 
-        public long ReadSyncedData(
+        public async Task<SyncResult<TEntity>> ReadSyncedDataAsync(
             long lastSync,
-            out TEntity[] newData,
-            out TEntity[] deletedData,
             Expression<Func<TEntity, bool>> additionalFilter = null)
         {
+            var syncResult = new SyncResult<TEntity>();
             var newLastSync = this.GetLastTick();
 
             Expression<Func<TEntity, bool>> newFilter = x => !x.IsDeleted && x.Ticks > lastSync && x.Ticks <= newLastSync;
@@ -78,10 +78,10 @@ namespace Mongo.Service.Core.Storage
                 deletedFilter = deletedFilter.And(additionalFilter);
             }
 
-            newData = this.ReadAsync(newFilter);
-            deletedData = this.ReadAsync(deletedFilter);
+            syncResult.NewData = await this.ReadAsync(newFilter).ConfigureAwait(false);
+            syncResult.DeletedData = await this.ReadAsync(deletedFilter).ConfigureAwait(false);
 
-            return newLastSync;
+            return syncResult;
         }
 
         public bool Exists(Guid id)
@@ -97,9 +97,8 @@ namespace Mongo.Service.Core.Storage
             }
             else
             {
-                TEntity currentEntity;
-                var exists = this.TryRead(entity.Id, out currentEntity);
-                if (exists && currentEntity.IsDeleted)
+                var currentEntity = this.ReadAsync(x => x.Id == entity.Id).Result.FirstOrDefault();
+                if (currentEntity != null && currentEntity.IsDeleted)
                 {
                     entity.IsDeleted = true;
                 }
@@ -118,32 +117,32 @@ namespace Mongo.Service.Core.Storage
             }
         }
 
-        public void Remove(Guid id)
+        public async Task RemoveAsync(Guid id)
         {
-            var entity = this.ReadAsync(id);
+            var entity = await this.ReadAsync(id).ConfigureAwait(false);
             entity.IsDeleted = true;
 
             this.Write(entity);
         }
 
-        public void Remove(Guid[] ids)
+        public void RemoveAsync(Guid[] ids)
         {
             foreach (var id in ids)
             {
-                this.Remove(id);
+                this.RemoveAsync(id);
             }
         }
 
-        public void Remove(TEntity entity)
+        public void RemoveAsync(TEntity entity)
         {
-            this.Remove(entity.Id);
+            this.RemoveAsync(entity.Id);
         }
 
-        public void Remove(TEntity[] entities)
+        public void RemoveAsync(TEntity[] entities)
         {
             foreach (var entity in entities)
             {
-                this.Remove(entity.Id);
+                this.RemoveAsync(entity.Id);
             }
         }
 
