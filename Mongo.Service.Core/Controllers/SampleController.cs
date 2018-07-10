@@ -33,9 +33,9 @@ namespace Mongo.Service.Core.Controllers
             return apiSync;
         }
 
-        public void Post(ApiSample apiSample)
+        public async Task PostAsync(ApiSample apiSample)
         {
-            this.service.WriteAsync(apiSample);
+            await this.service.WriteAsync(apiSample).ConfigureAwait(false);
         }
     }
 }

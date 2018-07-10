@@ -35,7 +35,7 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "testData"
             };
 
-            this.repository.WriteAsync(entity);
+            this.repository.WriteAsync(entity).Wait();
 
             var readedEntity = this.repository.ReadAsync(entity.Id).Result;
 
@@ -79,7 +79,7 @@ namespace Mongo.Service.Core.Tests
                 }
             };
 
-            this.repository.WriteAsync(entities);
+            this.repository.WriteAsync(entities).Wait();
 
             var readedEntities = this.repository.ReadAsync(x => x.IsDeleted == false).Result;
             Assert.AreEqual(2, readedEntities.Count);
@@ -129,7 +129,7 @@ namespace Mongo.Service.Core.Tests
                     SomeData = "3"
                 }
             };
-            this.repository.WriteAsync(entities);
+            this.repository.WriteAsync(entities).Wait();
 
             var anonymousEntitiesBefore = entities.Select(x => new { x.Id, x.SomeData }).Take(2);
             var readedEntities = this.repository.ReadAsync(0, 2).Result;
@@ -166,8 +166,8 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "testData"
             };
 
-            this.repository.WriteAsync(entity1);
-            this.repository.RemoveAsync(entity1);
+            this.repository.WriteAsync(entity1).Wait();
+            this.repository.RemoveAsync(entity1).Wait();
 
             var readedEntity = this.repository.ReadAsync(entity1.Id).Result;
             Assert.IsTrue(readedEntity.IsDeleted);
@@ -178,8 +178,8 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "testData"
             };
 
-            this.repository.WriteAsync(new[] { entity2, entity3 });
-            this.repository.RemoveAsync(new[] { entity2, entity3 });
+            this.repository.WriteAsync(new[] { entity2, entity3 }).Wait();
+            this.repository.RemoveAsync(new[] { entity2, entity3 }).Wait();
             readedEntity = this.repository.ReadAsync(entity2.Id).Result;
             Assert.IsTrue(readedEntity.IsDeleted);
 
@@ -196,10 +196,10 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "testData"
             };
 
-            this.repository.WriteAsync(entity);
-            this.repository.RemoveAsync(entity);
+            this.repository.WriteAsync(entity).Wait();
+            this.repository.RemoveAsync(entity).Wait();
 
-            this.repository.WriteAsync(entity);
+            this.repository.WriteAsync(entity).Wait();
             var readedEntity = this.repository.ReadAsync(entity.Id).Result;
             Assert.IsTrue(readedEntity.IsDeleted);
         }
@@ -212,7 +212,7 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid()
             };
 
-            this.repository.WriteAsync(entity);
+            this.repository.WriteAsync(entity).Wait();
             Assert.IsTrue(this.repository.Exists(entity.Id));
             Assert.IsFalse(this.repository.Exists(Guid.NewGuid()));
         }
@@ -244,7 +244,7 @@ namespace Mongo.Service.Core.Tests
                 }
             };
 
-            this.repository.WriteAsync(entities);
+            this.repository.WriteAsync(entities).Wait();
             var anonymousEntitiesBefore = entities.Select(x => new { x.Id, x.SomeData });
             var readedEntities = this.repository.ReadAllAsync().Result;
             var anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
@@ -265,10 +265,10 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "2"
             };
 
-            this.repository.WriteAsync(entity1);
+            this.repository.WriteAsync(entity1).Wait();
             Assert.AreEqual(1, this.repository.Count());
 
-            this.repository.WriteAsync(entity2);
+            this.repository.WriteAsync(entity2).Wait();
             Assert.AreEqual(2, this.repository.Count());
 
             Assert.AreEqual(1, this.repository.Count(x => x.SomeData == "2"));
@@ -366,7 +366,7 @@ namespace Mongo.Service.Core.Tests
             {
                 Id = Guid.NewGuid()
             };
-            this.repository.WriteAsync(entity);
+            this.repository.WriteAsync(entity).Wait();
             var readedEntity = this.repository.ReadAsync(entity.Id).Result;
             var ticksBefore = readedEntity.Ticks;
             this.repository.UpdateTicks(entity.Id);
@@ -383,7 +383,7 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid(),
                 SomeData = "data before"
             };
-            this.repository.WriteAsync(entity);
+            this.repository.WriteAsync(entity).Wait();
             var readedEntity = this.repository.ReadAsync(entity.Id).Result;
             var ticksBefore = readedEntity.Ticks;
             var updater = this.repository.Updater;
@@ -403,7 +403,7 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid(),
                 SomeData = "data before"
             };
-            this.repository.WriteAsync(entity);
+            this.repository.WriteAsync(entity).Wait();
             var readedEntity = this.repository.ReadAsync(entity.Id).Result;
             var ticksBefore = readedEntity.Ticks;
             var updater = this.repository.Updater;

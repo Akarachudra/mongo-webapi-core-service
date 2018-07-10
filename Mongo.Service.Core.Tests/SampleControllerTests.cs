@@ -80,7 +80,7 @@ namespace Mongo.Service.Core.Tests
             };
 
             var sampleController = new SampleController(this.service);
-            sampleController.Post(apiEntity);
+            sampleController.PostAsync(apiEntity).Wait();
 
             var readedEtity = this.service.ReadAsync(apiEntity.Id).Result;
             Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, readedEtity));

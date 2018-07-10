@@ -78,6 +78,7 @@ namespace Mongo.Service.Core.Storage
                 deletedFilter = deletedFilter.And(additionalFilter);
             }
 
+            syncResult.LastSync = newLastSync;
             syncResult.NewData = await this.ReadAsync(newFilter).ConfigureAwait(false);
             syncResult.DeletedData = await this.ReadAsync(deletedFilter).ConfigureAwait(false);
 

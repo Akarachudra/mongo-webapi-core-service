@@ -40,8 +40,8 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "test"
             };
 
-            this.service.WriteAsync(apiEntity);
-            var readedApiEntity = this.service.ReadAsync(apiEntity.Id);
+            this.service.WriteAsync(apiEntity).Wait();
+            var readedApiEntity = this.service.ReadAsync(apiEntity.Id).Result;
 
             Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, readedApiEntity));
         }
@@ -63,7 +63,7 @@ namespace Mongo.Service.Core.Tests
                 }
             };
 
-            this.service.WriteAsync(apiEntities);
+            this.service.WriteAsync(apiEntities).Wait();
 
             var readedApiEntities = this.service.ReadAsync(x => x.SomeData == "testData1").Result;
             Assert.AreEqual(1, readedApiEntities.Count);
@@ -79,7 +79,7 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "test"
             };
 
-            this.service.WriteAsync(apiEntity);
+            this.service.WriteAsync(apiEntity).Wait();
             Assert.IsTrue(this.service.Exists(apiEntity.Id));
             Assert.IsFalse(this.service.Exists(Guid.NewGuid()));
         }
@@ -102,7 +102,7 @@ namespace Mongo.Service.Core.Tests
             };
 
             var anonymousBefore = apiEntities.Select(x => new { x.Id, x.SomeData });
-            this.service.WriteAsync(apiEntities);
+            this.service.WriteAsync(apiEntities).Wait();
             var readedAllApiEntities = this.service.ReadAllAsync().Result;
             var anonymousAfter = readedAllApiEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousBefore, anonymousAfter);
@@ -176,13 +176,13 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "testData"
             };
 
-            this.service.WriteAsync(apiEntity1);
-            this.service.RemoveAsync(apiEntity1);
+            this.service.WriteAsync(apiEntity1).Wait();
+            this.service.RemoveAsync(apiEntity1).Wait();
             var readedEntities = this.service.ReadAsync(x => !x.IsDeleted).Result;
             Assert.AreEqual(0, readedEntities.Count);
 
-            this.service.WriteAsync(new[] { apiEntity2, apiEntity3 });
-            this.service.RemoveAsync(new[] { apiEntity2, apiEntity3 });
+            this.service.WriteAsync(new[] { apiEntity2, apiEntity3 }).Wait();
+            this.service.RemoveAsync(new[] { apiEntity2, apiEntity3 }).Wait();
             readedEntities = this.service.ReadAsync(x => !x.IsDeleted).Result;
             Assert.AreEqual(0, readedEntities.Count);
         }
