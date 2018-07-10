@@ -8,7 +8,9 @@ using Mongo.Service.Core.Types.Base;
 
 namespace Mongo.Service.Core.Services
 {
-    public class EntityService<TApi, TEntity> : IEntityService<TApi, TEntity> where TApi : IApiBase where TEntity : IBaseEntity
+    public class EntityService<TApi, TEntity> : IEntityService<TApi, TEntity>
+        where TApi : IApiBase
+        where TEntity : IBaseEntity
     {
         private readonly IMapper<TApi, TEntity> mapper;
 

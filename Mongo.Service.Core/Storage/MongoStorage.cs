@@ -43,18 +43,21 @@ namespace Mongo.Service.Core.Storage
             database = client.GetDatabase(mongoDataBaseName);
         }
 
-        public IMongoCollection<TEntity> GetCollection<TEntity>() where TEntity : IBaseEntity
+        public IMongoCollection<TEntity> GetCollection<TEntity>()
+            where TEntity : IBaseEntity
         {
             var collectionName = GetCollectionName(typeof(TEntity));
             return database.GetCollection<TEntity>(collectionName);
         }
 
-        public void DropCollection<TEntity>() where TEntity : IBaseEntity
+        public void DropCollection<TEntity>()
+            where TEntity : IBaseEntity
         {
             database.DropCollection(GetCollectionName(typeof(TEntity)));
         }
 
-        public void ClearCollection<TEntity>() where TEntity : IBaseEntity
+        public void ClearCollection<TEntity>()
+            where TEntity : IBaseEntity
         {
             GetCollection<TEntity>().DeleteMany(FilterDefinition<TEntity>.Empty);
         }

@@ -6,7 +6,9 @@ using Mongo.Service.Core.Types.Base;
 
 namespace Mongo.Service.Core.Services.Mapping
 {
-    public class Mapper<TApi, TEntity> : IMapper<TApi, TEntity> where TEntity : IBaseEntity where TApi : IApiBase
+    public class Mapper<TApi, TEntity> : IMapper<TApi, TEntity>
+        where TEntity : IBaseEntity
+        where TApi : IApiBase
     {
         public Mapper()
         {
@@ -46,6 +48,7 @@ namespace Mongo.Service.Core.Services.Mapping
         }
 
         protected IMapper ApiToEntityMapper { get; set; }
+
         protected IMapper EntityToApiMapper { get; set; }
 
         private void ConfigureMappers()

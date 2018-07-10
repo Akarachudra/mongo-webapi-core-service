@@ -8,17 +8,19 @@ using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storage
 {
-    public class MongoRepository<TEntity> : IMongoRepository<TEntity> where TEntity : IBaseEntity
+    public class EntityStorage<TEntity> : IEntityStorage<TEntity>
+        where TEntity : IBaseEntity
     {
         private const int TicksWriteTries = 100;
 
-        public MongoRepository(IMongoStorage mongoStorage, IIndexes<TEntity> indexes)
+        public EntityStorage(IMongoStorage mongoStorage, IIndexes<TEntity> indexes)
         {
             Collection = mongoStorage.GetCollection<TEntity>();
             indexes.CreateIndexes(Collection);
         }
 
         public IMongoCollection<TEntity> Collection { get; }
+
         public UpdateDefinitionBuilder<TEntity> Updater => Builders<TEntity>.Update;
 
         public TEntity Read(Guid id)

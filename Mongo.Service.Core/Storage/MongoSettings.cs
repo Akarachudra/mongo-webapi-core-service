@@ -11,9 +11,13 @@ namespace Mongo.Service.Core.Storage
         }
 
         public MongoServerAddress[] MongoServers { get; set; }
+
         public string MongoDatabaseName { get; set; }
+
         public string MongoUserName { get; set; }
+
         public string MongoPassword { get; set; }
+
         public string MongoReplicaSetName { get; set; }
     }
 }

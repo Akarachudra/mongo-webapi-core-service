@@ -4,7 +4,8 @@ using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storable.Indexes
 {
-    public class Indexes<TEntity> : IIndexes<TEntity> where TEntity : IBaseEntity
+    public class Indexes<TEntity> : IIndexes<TEntity>
+        where TEntity : IBaseEntity
     {
         public void CreateIndexes(IMongoCollection<TEntity> collection)
         {
