@@ -47,26 +47,6 @@ namespace Mongo.Service.Core.Tests
         }
 
         [Test]
-        public void TryReadIsCorrect()
-        {
-            var apiEntity = new ApiSample
-            {
-                Id = Guid.NewGuid(),
-                SomeData = "test"
-            };
-
-            this.service.Write(apiEntity);
-            ApiSample resultApiEntity;
-            var readResult = this.service.TryRead(apiEntity.Id, out resultApiEntity);
-            Assert.IsTrue(readResult);
-            Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, resultApiEntity));
-
-            readResult = this.service.TryRead(Guid.NewGuid(), out resultApiEntity);
-            Assert.IsFalse(readResult);
-            Assert.AreEqual(default(ApiSample), resultApiEntity);
-        }
-
-        [Test]
         public void CanWriteArrayAndReadWithFilter()
         {
             var apiEntities = new[]
@@ -85,8 +65,8 @@ namespace Mongo.Service.Core.Tests
 
             this.service.Write(apiEntities);
 
-            var readedApiEntities = this.service.ReadAsync(x => x.SomeData == "testData1");
-            Assert.AreEqual(1, readedApiEntities.Length);
+            var readedApiEntities = this.service.ReadAsync(x => x.SomeData == "testData1").Result;
+            Assert.AreEqual(1, readedApiEntities.Count);
             Assert.AreEqual("testData1", readedApiEntities[0].SomeData);
         }
 
@@ -123,7 +103,7 @@ namespace Mongo.Service.Core.Tests
 
             var anonymousBefore = apiEntities.Select(x => new { x.Id, x.SomeData });
             this.service.Write(apiEntities);
-            var readedAllApiEntities = this.service.ReadAllAsync();
+            var readedAllApiEntities = this.service.ReadAllAsync().Result;
             var anonymousAfter = readedAllApiEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousBefore, anonymousAfter);
         }
@@ -157,7 +137,7 @@ namespace Mongo.Service.Core.Tests
             this.service.Write(apiEntities);
 
             var anonymousEntitiesBefore = apiEntities.Select(x => new { x.Id, x.SomeData }).Take(2);
-            var readedEntities = this.service.ReadAsync(0, 2);
+            var readedEntities = this.service.ReadAsync(0, 2).Result;
             var anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
 
@@ -165,14 +145,14 @@ namespace Mongo.Service.Core.Tests
                                                  .Select(x => new { x.Id, x.SomeData })
                                                  .Skip(1)
                                                  .Take(1);
-            readedEntities = this.service.ReadAsync(x => x.SomeData == "3", 1, 1);
+            readedEntities = this.service.ReadAsync(x => x.SomeData == "3", 1, 1).Result;
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
 
             anonymousEntitiesBefore = apiEntities.Select(x => new { x.Id, x.SomeData })
                                                  .Skip(1)
                                                  .Take(2);
-            readedEntities = this.service.ReadAsync(1, 2);
+            readedEntities = this.service.ReadAsync(1, 2).Result;
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
         }
@@ -198,42 +178,13 @@ namespace Mongo.Service.Core.Tests
 
             this.service.Write(apiEntity1);
             this.service.Remove(apiEntity1);
-            var readedEntities = this.service.ReadAsync(x => !x.IsDeleted);
-            Assert.AreEqual(0, readedEntities.Length);
+            var readedEntities = this.service.ReadAsync(x => !x.IsDeleted).Result;
+            Assert.AreEqual(0, readedEntities.Count);
 
             this.service.Write(new[] { apiEntity2, apiEntity3 });
             this.service.Remove(new[] { apiEntity2, apiEntity3 });
-            readedEntities = this.service.ReadAsync(x => !x.IsDeleted);
-            Assert.AreEqual(0, readedEntities.Length);
-        }
-
-        [Test]
-        public void CanReadIdsOnly()
-        {
-            var apiEntities = new[]
-            {
-                new ApiSample
-                {
-                    Id = Guid.NewGuid()
-                },
-                new ApiSample
-                {
-                    Id = Guid.NewGuid()
-                },
-                new ApiSample
-                {
-                    Id = Guid.NewGuid()
-                },
-                new ApiSample
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
-
-            this.service.Write(apiEntities);
-            var idsBefore = apiEntities.Select(x => x.Id);
-            var idsAfter = this.service.ReadIds(x => !x.IsDeleted);
-            CollectionAssert.AreEquivalent(idsBefore, idsAfter);
+            readedEntities = this.service.ReadAsync(x => !x.IsDeleted).Result;
+            Assert.AreEqual(0, readedEntities.Count);
         }
 
         [Test]

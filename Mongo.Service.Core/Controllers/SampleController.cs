@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Web.Http;
 using Mongo.Service.Core.Services;
 using Mongo.Service.Core.Storable;
@@ -16,14 +17,14 @@ namespace Mongo.Service.Core.Controllers
             this.service = service;
         }
 
-        public IEnumerable<ApiSample> GetAll()
+        public async Task<IEnumerable<ApiSample>> GetAllAsync()
         {
-            return this.service.ReadAllAsync();
+            return await this.service.ReadAllAsync().ConfigureAwait(false);
         }
 
-        public ApiSample Get(Guid id)
+        public async Task<ApiSample> GetAsync(Guid id)
         {
-            return this.service.ReadAsync(id);
+            return await this.service.ReadAsync(id).ConfigureAwait(false);
         }
 
         public ApiSync<ApiSample> Get(long lastSync)
