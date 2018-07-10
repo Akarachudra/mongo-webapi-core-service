@@ -127,6 +127,7 @@
     <Compile Include="Storage\IMongoStorage.cs" />
     <Compile Include="Storage\MongoSettings.cs" />
     <Compile Include="Storage\MongoStorage.cs" />
+    <Compile Include="Storage\SyncResult.cs" />
     <Compile Include="WebApp\ExceptionLogger.cs" />
     <Compile Include="WebApp\IApiService.cs" />
     <Compile Include="WebApp\IServiceSettings.cs" />

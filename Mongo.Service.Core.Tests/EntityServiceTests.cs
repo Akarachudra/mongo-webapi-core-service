@@ -41,7 +41,7 @@ namespace Mongo.Service.Core.Tests
             };
 
             this.service.Write(apiEntity);
-            var readedApiEntity = this.service.Read(apiEntity.Id);
+            var readedApiEntity = this.service.ReadAsync(apiEntity.Id);
 
             Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, readedApiEntity));
         }
@@ -85,7 +85,7 @@ namespace Mongo.Service.Core.Tests
 
             this.service.Write(apiEntities);
 
-            var readedApiEntities = this.service.Read(x => x.SomeData == "testData1");
+            var readedApiEntities = this.service.ReadAsync(x => x.SomeData == "testData1");
             Assert.AreEqual(1, readedApiEntities.Length);
             Assert.AreEqual("testData1", readedApiEntities[0].SomeData);
         }
@@ -123,7 +123,7 @@ namespace Mongo.Service.Core.Tests
 
             var anonymousBefore = apiEntities.Select(x => new { x.Id, x.SomeData });
             this.service.Write(apiEntities);
-            var readedAllApiEntities = this.service.ReadAll();
+            var readedAllApiEntities = this.service.ReadAllAsync();
             var anonymousAfter = readedAllApiEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousBefore, anonymousAfter);
         }
@@ -157,7 +157,7 @@ namespace Mongo.Service.Core.Tests
             this.service.Write(apiEntities);
 
             var anonymousEntitiesBefore = apiEntities.Select(x => new { x.Id, x.SomeData }).Take(2);
-            var readedEntities = this.service.Read(0, 2);
+            var readedEntities = this.service.ReadAsync(0, 2);
             var anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
 
@@ -165,14 +165,14 @@ namespace Mongo.Service.Core.Tests
                                                  .Select(x => new { x.Id, x.SomeData })
                                                  .Skip(1)
                                                  .Take(1);
-            readedEntities = this.service.Read(x => x.SomeData == "3", 1, 1);
+            readedEntities = this.service.ReadAsync(x => x.SomeData == "3", 1, 1);
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
 
             anonymousEntitiesBefore = apiEntities.Select(x => new { x.Id, x.SomeData })
                                                  .Skip(1)
                                                  .Take(2);
-            readedEntities = this.service.Read(1, 2);
+            readedEntities = this.service.ReadAsync(1, 2);
             anonymousEntitiesAfter = readedEntities.Select(x => new { x.Id, x.SomeData });
             CollectionAssert.AreEquivalent(anonymousEntitiesBefore, anonymousEntitiesAfter);
         }
@@ -198,12 +198,12 @@ namespace Mongo.Service.Core.Tests
 
             this.service.Write(apiEntity1);
             this.service.Remove(apiEntity1);
-            var readedEntities = this.service.Read(x => !x.IsDeleted);
+            var readedEntities = this.service.ReadAsync(x => !x.IsDeleted);
             Assert.AreEqual(0, readedEntities.Length);
 
             this.service.Write(new[] { apiEntity2, apiEntity3 });
             this.service.Remove(new[] { apiEntity2, apiEntity3 });
-            readedEntities = this.service.Read(x => !x.IsDeleted);
+            readedEntities = this.service.ReadAsync(x => !x.IsDeleted);
             Assert.AreEqual(0, readedEntities.Length);
         }
 

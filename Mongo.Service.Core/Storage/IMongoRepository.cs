@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Mongo.Service.Core.Storable.Base;
 using MongoDB.Driver;
 
@@ -12,19 +14,15 @@ namespace Mongo.Service.Core.Storage
 
         UpdateDefinitionBuilder<TEntity> Updater { get; }
 
-        TEntity Read(Guid id);
+        Task<TEntity> ReadAsync(Guid id);
 
-        TEntity[] Read(Expression<Func<TEntity, bool>> filter);
+        Task<IList<TEntity>> ReadAsync(Expression<Func<TEntity, bool>> filter);
 
-        TEntity[] Read(int skip, int limit);
+        Task<IList<TEntity>> ReadAsync(int skip, int limit);
 
-        TEntity[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit);
+        Task<IList<TEntity>> ReadAsync(Expression<Func<TEntity, bool>> filter, int skip, int limit);
 
-        bool TryRead(Guid id, out TEntity outEntity);
-
-        TEntity[] ReadAll();
-
-        Guid[] ReadIds(Expression<Func<TEntity, bool>> filter);
+        Task<IList<TEntity>> ReadAllAsync();
 
         long ReadSyncedData(
             long lastSync,

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storage;
 using Mongo.Service.Core.Types.Base;
@@ -10,21 +12,17 @@ namespace Mongo.Service.Core.Services
         where TApi : IApiBase
         where TEntity : IBaseEntity
     {
-        IMongoRepository<TEntity> Storage { get; }
+        IMongoRepository<TEntity> Repository { get; }
 
-        TApi Read(Guid id);
+        Task<TApi> ReadAsync(Guid id);
 
-        bool TryRead(Guid id, out TApi apiEntity);
+        Task<IList<TApi>> ReadAsync(int skip, int limit);
 
-        TApi[] Read(int skip, int limit);
+        Task<IList<TApi>> ReadAsync(Expression<Func<TEntity, bool>> filter, int skip, int limit);
 
-        TApi[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit);
+        Task<IList<TApi>> ReadAsync(Expression<Func<TEntity, bool>> filter);
 
-        TApi[] Read(Expression<Func<TEntity, bool>> filter);
-
-        TApi[] ReadAll();
-
-        Guid[] ReadIds(Expression<Func<TEntity, bool>> filter);
+        Task<IList<TApi>> ReadAllAsync();
 
         long ReadSyncedData(
             long lastSync,

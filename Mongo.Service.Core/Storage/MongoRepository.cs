@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Mongo.Service.Core.Extensions;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storable.Indexes;
@@ -23,9 +24,9 @@ namespace Mongo.Service.Core.Storage
 
         public UpdateDefinitionBuilder<TEntity> Updater => Builders<TEntity>.Update;
 
-        public TEntity Read(Guid id)
+        public async Task<TEntity> ReadAsync(Guid id)
         {
-            var entity = this.Collection.FindSync(x => x.Id == id).FirstOrDefault();
+            var entity = (await this.Collection.FindAsync(x => x.Id == id).ConfigureAwait(false)).FirstOrDefault();
             if (entity == null)
             {
                 throw new Exception($"{typeof(TEntity).Name} with id {id} not found");
@@ -34,47 +35,30 @@ namespace Mongo.Service.Core.Storage
             return entity;
         }
 
-        public TEntity[] Read(Expression<Func<TEntity, bool>> filter)
+        public async Task<IList<TEntity>> ReadAsync(Expression<Func<TEntity, bool>> filter)
         {
-            var entities = this.Collection.FindSync(filter).ToList();
-            return entities.ToArray();
+            var entities = await
+                (await this.Collection.FindAsync(filter).ConfigureAwait(false)).ToListAsync().ConfigureAwait(false);
+            return entities;
         }
 
-        public TEntity[] Read(int skip, int limit)
+        public async Task<IList<TEntity>> ReadAsync(int skip, int limit)
         {
-            var entities = this.Collection.Aggregate().Skip(skip).Limit(limit).ToList();
-            return entities.ToArray();
+            var entities = await this.Collection.Aggregate().Skip(skip).Limit(limit).ToListAsync().ConfigureAwait(false);
+            return entities;
         }
 
-        public TEntity[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit)
+        public async Task<IList<TEntity>> ReadAsync(Expression<Func<TEntity, bool>> filter, int skip, int limit)
         {
-            var entities = this.Collection.Aggregate().Match(filter).Skip(skip).Limit(limit).ToList();
-            return entities.ToArray();
+            var entities = await this.Collection.Aggregate().Match(filter).Skip(skip).Limit(limit).ToListAsync().ConfigureAwait(false);
+            return entities;
         }
 
-        public bool TryRead(Guid id, out TEntity outEntity)
+        public async Task<IList<TEntity>> ReadAllAsync()
         {
-            var entity = this.Collection.FindSync(x => x.Id == id).FirstOrDefault();
-            if (entity == null)
-            {
-                outEntity = default(TEntity);
-                return false;
-            }
-
-            outEntity = entity;
-            return true;
-        }
-
-        public TEntity[] ReadAll()
-        {
-            var entities = this.Collection.FindSync(FilterDefinition<TEntity>.Empty).ToList();
-            return entities.ToArray();
-        }
-
-        public Guid[] ReadIds(Expression<Func<TEntity, bool>> filter)
-        {
-            var ids = this.Collection.FindSync(filter).ToList().Select(x => x.Id).ToArray();
-            return ids;
+            var entities = await
+                (await this.Collection.FindAsync(FilterDefinition<TEntity>.Empty).ConfigureAwait(false)).ToListAsync().ConfigureAwait(false);
+            return entities;
         }
 
         public long ReadSyncedData(
@@ -94,8 +78,8 @@ namespace Mongo.Service.Core.Storage
                 deletedFilter = deletedFilter.And(additionalFilter);
             }
 
-            newData = this.Read(newFilter);
-            deletedData = this.Read(deletedFilter);
+            newData = this.ReadAsync(newFilter);
+            deletedData = this.ReadAsync(deletedFilter);
 
             return newLastSync;
         }
@@ -136,7 +120,7 @@ namespace Mongo.Service.Core.Storage
 
         public void Remove(Guid id)
         {
-            var entity = this.Read(id);
+            var entity = this.ReadAsync(id);
             entity.IsDeleted = true;
 
             this.Write(entity);

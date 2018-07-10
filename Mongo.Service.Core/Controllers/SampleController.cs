@@ -18,12 +18,12 @@ namespace Mongo.Service.Core.Controllers
 
         public IEnumerable<ApiSample> GetAll()
         {
-            return this.service.ReadAll();
+            return this.service.ReadAllAsync();
         }
 
         public ApiSample Get(Guid id)
         {
-            return this.service.Read(id);
+            return this.service.ReadAsync(id);
         }
 
         public ApiSync<ApiSample> Get(long lastSync)

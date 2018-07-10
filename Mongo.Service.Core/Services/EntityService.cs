@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Mongo.Service.Core.Services.Mapping;
 using Mongo.Service.Core.Storable.Base;
 using Mongo.Service.Core.Storage;
@@ -14,61 +16,42 @@ namespace Mongo.Service.Core.Services
     {
         private readonly IMapper<TApi, TEntity> mapper;
 
-        public EntityService(IMongoRepository<TEntity> storage, IMapper<TApi, TEntity> mapper)
+        public EntityService(IMongoRepository<TEntity> repository, IMapper<TApi, TEntity> mapper)
         {
-            this.Storage = storage;
+            this.Repository = repository;
             this.mapper = mapper;
         }
 
-        public IMongoRepository<TEntity> Storage { get; }
+        public IMongoRepository<TEntity> Repository { get; }
 
-        public virtual TApi Read(Guid id)
+        public virtual async Task<TApi> ReadAsync(Guid id)
         {
-            var entity = this.Storage.Read(id);
+            var entity = await this.Repository.ReadAsync(id).ConfigureAwait(false);
             return this.mapper.GetApiFromEntity(entity);
         }
 
-        public virtual bool TryRead(Guid id, out TApi apiEntity)
+        public virtual async Task<IList<TApi>> ReadAsync(int skip, int limit)
         {
-            TEntity entity;
-            var result = this.Storage.TryRead(id, out entity);
-            if (result)
-            {
-                apiEntity = this.mapper.GetApiFromEntity(entity);
-                return true;
-            }
-
-            apiEntity = default(TApi);
-            return false;
-        }
-
-        public virtual TApi[] Read(int skip, int limit)
-        {
-            var entities = this.Storage.Read(skip, limit);
+            var entities = await this.Repository.ReadAsync(skip, limit).ConfigureAwait(false);
             return this.mapper.GetApiFromEntity(entities);
         }
 
-        public virtual TApi[] Read(Expression<Func<TEntity, bool>> filter, int skip, int limit)
+        public virtual async Task<IList<TApi>> ReadAsync(Expression<Func<TEntity, bool>> filter, int skip, int limit)
         {
-            var entities = this.Storage.Read(filter, skip, limit);
+            var entities = await this.Repository.ReadAsync(filter, skip, limit).ConfigureAwait(false);
             return this.mapper.GetApiFromEntity(entities);
         }
 
-        public virtual TApi[] Read(Expression<Func<TEntity, bool>> filter)
+        public virtual async Task<IList<TApi>> ReadAsync(Expression<Func<TEntity, bool>> filter)
         {
-            var entities = this.Storage.Read(filter);
+            var entities = await this.Repository.ReadAsync(filter).ConfigureAwait(false);
             return this.mapper.GetApiFromEntity(entities);
         }
 
-        public virtual TApi[] ReadAll()
+        public virtual async Task<IList<TApi>> ReadAllAsync()
         {
-            var entities = this.Storage.ReadAll();
+            var entities = await this.Repository.ReadAllAsync().ConfigureAwait(false);
             return this.mapper.GetApiFromEntity(entities);
-        }
-
-        public virtual Guid[] ReadIds(Expression<Func<TEntity, bool>> filter)
-        {
-            return this.Storage.ReadIds(filter);
         }
 
         public virtual long ReadSyncedData(
@@ -80,7 +63,7 @@ namespace Mongo.Service.Core.Services
             TEntity[] newEntities;
             TEntity[] deletedEntities;
 
-            var newSync = this.Storage.ReadSyncedData(lastSync, out newEntities, out deletedEntities, additionalFilter);
+            var newSync = this.Repository.ReadSyncedData(lastSync, out newEntities, out deletedEntities, additionalFilter);
 
             newData = this.mapper.GetApiFromEntity(newEntities);
             deletedData = deletedEntities.Select(x => x.Id).ToArray();
@@ -90,13 +73,13 @@ namespace Mongo.Service.Core.Services
 
         public virtual bool Exists(Guid id)
         {
-            return this.Storage.Exists(id);
+            return this.Repository.Exists(id);
         }
 
         public virtual void Write(TApi apiEntity)
         {
             var entity = this.mapper.GetEntityFromApi(apiEntity);
-            this.Storage.Write(entity);
+            this.Repository.Write(entity);
         }
 
         public virtual void Write(TApi[] apiEntities)
@@ -109,23 +92,23 @@ namespace Mongo.Service.Core.Services
 
         public virtual void Remove(Guid id)
         {
-            this.Storage.Remove(id);
+            this.Repository.Remove(id);
         }
 
         public virtual void Remove(Guid[] ids)
         {
-            this.Storage.Remove(ids);
+            this.Repository.Remove(ids);
         }
 
         public virtual void Remove(TApi apiEntity)
         {
-            this.Storage.Remove(apiEntity.Id);
+            this.Repository.Remove(apiEntity.Id);
         }
 
         public virtual void Remove(TApi[] apiEntities)
         {
             var entities = this.mapper.GetEntityFromApi(apiEntities);
-            this.Storage.Remove(entities);
+            this.Repository.Remove(entities);
         }
     }
 }
