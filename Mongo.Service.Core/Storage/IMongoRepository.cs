@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storage
 {
-    public interface IEntityStorage<TEntity> where TEntity : IBaseEntity
+    public interface IMongoRepository<TEntity> where TEntity : IBaseEntity
     {
         IMongoCollection<TEntity> Collection { get; }
         UpdateDefinitionBuilder<TEntity> Updater { get; }

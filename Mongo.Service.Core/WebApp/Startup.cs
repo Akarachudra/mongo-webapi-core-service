@@ -43,7 +43,7 @@ namespace Mongo.Service.Core.WebApp
         {
             container.RegisterSingleton<IMongoStorage, MongoStorage>();
             container.RegisterSingleton<IMongoSettings, MongoSettings>();
-            container.RegisterSingleton<IEntityStorage<SampleEntity>, EntityStorage<SampleEntity>>();
+            container.RegisterSingleton<IMongoRepository<SampleEntity>, MongoRepository<SampleEntity>>();
             container.RegisterSingleton<IIndexes<SampleEntity>, Indexes<SampleEntity>>();
             container.RegisterSingleton<IEntityService<ApiSample, SampleEntity>, EntityService<ApiSample, SampleEntity>>();
             container.RegisterSingleton<IMapper<ApiSample, SampleEntity>, Mapper<ApiSample, SampleEntity>>();

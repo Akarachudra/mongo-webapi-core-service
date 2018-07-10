@@ -117,8 +117,8 @@
     <Compile Include="Storable\Indexes\Indexes.cs" />
     <Compile Include="Storable\SampleEntity.cs" />
     <Compile Include="Storage\CollectionNameAttribute.cs" />
-    <Compile Include="Storage\EntityStorage.cs" />
-    <Compile Include="Storage\IEntityStorage.cs" />
+    <Compile Include="Storage\MongoRepository.cs" />
+    <Compile Include="Storage\IMongoRepository.cs" />
     <Compile Include="Storage\IMongoSettings.cs" />
     <Compile Include="Storage\IMongoStorage.cs" />
     <Compile Include="Storage\MongoSettings.cs" />

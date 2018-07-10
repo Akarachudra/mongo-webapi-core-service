@@ -12,13 +12,13 @@ namespace Mongo.Service.Core.Services
     {
         private readonly IMapper<TApi, TEntity> mapper;
 
-        public EntityService(IEntityStorage<TEntity> storage, IMapper<TApi, TEntity> mapper)
+        public EntityService(IMongoRepository<TEntity> storage, IMapper<TApi, TEntity> mapper)
         {
             Storage = storage;
             this.mapper = mapper;
         }
 
-        public IEntityStorage<TEntity> Storage { get; }
+        public IMongoRepository<TEntity> Storage { get; }
 
         public virtual TApi Read(Guid id)
         {

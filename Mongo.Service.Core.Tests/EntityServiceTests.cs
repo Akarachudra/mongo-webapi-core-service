@@ -20,7 +20,7 @@ namespace Mongo.Service.Core.Tests
         public EntityServiceTests()
         {
             mongoStorage = new MongoStorage(new MongoSettings());
-            var storage = new EntityStorage<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
+            var storage = new MongoRepository<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
             var mapper = new Mapper<ApiSample, SampleEntity>();
             service = new EntityService<ApiSample, SampleEntity>(storage, mapper);
         }

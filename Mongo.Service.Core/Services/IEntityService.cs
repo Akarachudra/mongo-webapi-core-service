@@ -8,7 +8,7 @@ namespace Mongo.Service.Core.Services
 {
     public interface IEntityService<TApi, TEntity> where TApi : IApiBase where TEntity : IBaseEntity
     {
-        IEntityStorage<TEntity> Storage { get; }
+        IMongoRepository<TEntity> Storage { get; }
         TApi Read(Guid id);
         bool TryRead(Guid id, out TApi apiEntity);
         TApi[] Read(int skip, int limit);
