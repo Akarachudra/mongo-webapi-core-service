@@ -8,7 +8,7 @@ namespace Mongo.Service.Core.WebApp
     {
         public Task LogAsync(ExceptionLoggerContext context, CancellationToken cancellationToken)
         {
-            //TODO: log exceptions as you want
+            // TODO: log exceptions as you want
             return Task.FromResult(0);
         }
     }

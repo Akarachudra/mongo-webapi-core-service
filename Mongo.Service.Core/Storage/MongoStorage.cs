@@ -32,7 +32,8 @@ namespace Mongo.Service.Core.Storage
             {
                 mongoClientSettings.Credentials = new[]
                 {
-                    MongoCredential.CreateCredential(mongoDataBaseName,
+                    MongoCredential.CreateCredential(
+                        mongoDataBaseName,
                                                      mongoUserName,
                                                      settings.MongoPassword)
                 };
@@ -40,23 +41,26 @@ namespace Mongo.Service.Core.Storage
 
             var client = new MongoClient(mongoClientSettings);
 
-            database = client.GetDatabase(mongoDataBaseName);
+            this.database = client.GetDatabase(mongoDataBaseName);
         }
 
-        public IMongoCollection<TEntity> GetCollection<TEntity>() where TEntity : IBaseEntity
+        public IMongoCollection<TEntity> GetCollection<TEntity>()
+            where TEntity : IBaseEntity
         {
             var collectionName = GetCollectionName(typeof(TEntity));
-            return database.GetCollection<TEntity>(collectionName);
+            return this.database.GetCollection<TEntity>(collectionName);
         }
 
-        public void DropCollection<TEntity>() where TEntity : IBaseEntity
+        public void DropCollection<TEntity>()
+            where TEntity : IBaseEntity
         {
-            database.DropCollection(GetCollectionName(typeof(TEntity)));
+            this.database.DropCollection(GetCollectionName(typeof(TEntity)));
         }
 
-        public void ClearCollection<TEntity>() where TEntity : IBaseEntity
+        public void ClearCollection<TEntity>()
+            where TEntity : IBaseEntity
         {
-            GetCollection<TEntity>().DeleteMany(FilterDefinition<TEntity>.Empty);
+            this.GetCollection<TEntity>().DeleteMany(FilterDefinition<TEntity>.Empty);
         }
 
         private static string GetCollectionName(Type type)
@@ -72,9 +76,11 @@ namespace Mongo.Service.Core.Storage
                         throw new ArgumentException(
                             $"There is empty collection name at {typeof(CollectionNameAttribute).Name} in {type.Name}");
                     }
+
                     return collectionName;
                 }
             }
+
             throw new ArgumentException(
                 $"There is no {typeof(CollectionNameAttribute).Name} attribute at {type.Name}");
         }

@@ -5,7 +5,8 @@ using Mongo.Service.Core.Types.Base;
 namespace Mongo.Service.Core.Types
 {
     [DataContract]
-    public class ApiSync<TApi> where TApi : IApiBase
+    public class ApiSync<TApi>
+        where TApi : IApiBase
     {
         private TApi[] data;
         private Guid[] deleted;
@@ -13,15 +14,15 @@ namespace Mongo.Service.Core.Types
         [DataMember]
         public TApi[] Data
         {
-            get { return data ?? (data = new TApi[0]); }
-            set { data = value; }
+            get => this.data ?? (this.data = new TApi[0]);
+            set => this.data = value;
         }
 
         [DataMember]
         public Guid[] DeletedData
         {
-            get { return deleted ?? (deleted = new Guid[0]); }
-            set { deleted = value; }
+            get => this.deleted ?? (this.deleted = new Guid[0]);
+            set => this.deleted = value;
         }
 
         [DataMember]

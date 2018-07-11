@@ -30,8 +30,7 @@ namespace Mongo.Service.Core.WebApp
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+                defaults: new { id = RouteParameter.Optional });
 
             config.Services.Add(typeof(IExceptionLogger), new ExceptionLogger());
             config.DependencyResolver = new SimpleInjectorWebApiDependencyResolver(container);
@@ -43,7 +42,7 @@ namespace Mongo.Service.Core.WebApp
         {
             container.RegisterSingleton<IMongoStorage, MongoStorage>();
             container.RegisterSingleton<IMongoSettings, MongoSettings>();
-            container.RegisterSingleton<IEntityStorage<SampleEntity>, EntityStorage<SampleEntity>>();
+            container.RegisterSingleton<IMongoRepository<SampleEntity>, MongoRepository<SampleEntity>>();
             container.RegisterSingleton<IIndexes<SampleEntity>, Indexes<SampleEntity>>();
             container.RegisterSingleton<IEntityService<ApiSample, SampleEntity>, EntityService<ApiSample, SampleEntity>>();
             container.RegisterSingleton<IMapper<ApiSample, SampleEntity>, Mapper<ApiSample, SampleEntity>>();

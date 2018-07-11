@@ -11,9 +11,4 @@ namespace Mongo.Service.Core.Controllers.System
             return new PingResult { Status = "Ok" };
         }
     }
-
-    public class PingResult
-    {
-        public string Status { get; set; }
-    }
 }
