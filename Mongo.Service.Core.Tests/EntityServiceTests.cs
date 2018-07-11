@@ -80,8 +80,8 @@ namespace Mongo.Service.Core.Tests
             };
 
             this.service.WriteAsync(apiEntity).Wait();
-            Assert.IsTrue(this.service.Exists(apiEntity.Id));
-            Assert.IsFalse(this.service.Exists(Guid.NewGuid()));
+            Assert.IsTrue(this.service.ExistsAsync(apiEntity.Id).Result);
+            Assert.IsFalse(this.service.ExistsAsync(Guid.NewGuid()).Result);
         }
 
         [Test]

@@ -28,7 +28,7 @@ namespace Mongo.Service.Core.Storage
             long lastSync,
             Expression<Func<TEntity, bool>> additionalFilter = null);
 
-        bool Exists(Guid id);
+        Task<bool> ExistsAsync(Guid id);
 
         Task WriteAsync(TEntity entity);
 
@@ -42,9 +42,9 @@ namespace Mongo.Service.Core.Storage
 
         Task RemoveAsync(IEnumerable<TEntity> entities);
 
-        long Count();
+        Task<long> CountAsync();
 
-        long Count(Expression<Func<TEntity, bool>> filter);
+        Task<long> CountAsync(Expression<Func<TEntity, bool>> filter);
 
         long GetLastTick();
 

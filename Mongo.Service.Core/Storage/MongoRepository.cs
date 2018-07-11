@@ -85,9 +85,9 @@ namespace Mongo.Service.Core.Storage
             return syncResult;
         }
 
-        public bool Exists(Guid id)
+        public async Task<bool> ExistsAsync(Guid id)
         {
-            return this.Collection.FindSync(x => x.Id == id).FirstOrDefault() != null;
+            return (await this.Collection.FindAsync(x => x.Id == id).ConfigureAwait(false)).FirstOrDefault() != null;
         }
 
         public async Task WriteAsync(TEntity entity)
@@ -147,14 +147,14 @@ namespace Mongo.Service.Core.Storage
             }
         }
 
-        public long Count()
+        public async Task<long> CountAsync()
         {
-            return this.Collection.Count(FilterDefinition<TEntity>.Empty);
+            return await this.Collection.CountAsync(FilterDefinition<TEntity>.Empty).ConfigureAwait(false);
         }
 
-        public long Count(Expression<Func<TEntity, bool>> filter)
+        public async Task<long> CountAsync(Expression<Func<TEntity, bool>> filter)
         {
-            return this.Collection.Count(filter);
+            return await this.Collection.CountAsync(filter).ConfigureAwait(false);
         }
 
         public long GetLastTick()

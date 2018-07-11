@@ -67,9 +67,9 @@ namespace Mongo.Service.Core.Services
             return apiSync;
         }
 
-        public virtual bool Exists(Guid id)
+        public virtual async Task<bool> ExistsAsync(Guid id)
         {
-            return this.Repository.Exists(id);
+            return await this.Repository.ExistsAsync(id).ConfigureAwait(false);
         }
 
         public virtual async Task WriteAsync(TApi apiEntity)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
 using Mongo.Service.Core.Storable;
 using Mongo.Service.Core.Storable.Indexes;
 using Mongo.Service.Core.Storage;
@@ -213,8 +212,8 @@ namespace Mongo.Service.Core.Tests
             };
 
             this.repository.WriteAsync(entity).Wait();
-            Assert.IsTrue(this.repository.Exists(entity.Id));
-            Assert.IsFalse(this.repository.Exists(Guid.NewGuid()));
+            Assert.IsTrue(this.repository.ExistsAsync(entity.Id).Result);
+            Assert.IsFalse(this.repository.ExistsAsync(Guid.NewGuid()).Result);
         }
 
         [Test]
@@ -266,12 +265,12 @@ namespace Mongo.Service.Core.Tests
             };
 
             this.repository.WriteAsync(entity1).Wait();
-            Assert.AreEqual(1, this.repository.Count());
+            Assert.AreEqual(1, this.repository.CountAsync().Result);
 
             this.repository.WriteAsync(entity2).Wait();
-            Assert.AreEqual(2, this.repository.Count());
+            Assert.AreEqual(2, this.repository.CountAsync().Result);
 
-            Assert.AreEqual(1, this.repository.Count(x => x.SomeData == "2"));
+            Assert.AreEqual(1, this.repository.CountAsync(x => x.SomeData == "2").Result);
         }
 
         [Test]

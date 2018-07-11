@@ -29,7 +29,7 @@ namespace Mongo.Service.Core.Services
             long lastSync,
             Expression<Func<TEntity, bool>> additionalFilter = null);
 
-        bool Exists(Guid id);
+        Task<bool> ExistsAsync(Guid id);
 
         Task WriteAsync(TApi apiEntity);
 
