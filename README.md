@@ -11,9 +11,6 @@ Some other features:
 
 Add a new ApiType (your share this with client) to Mongo.Service.Core.Types project and inherit it from ApiBase:
 ```c#
-using System.Runtime.Serialization;
-using Mongo.Service.Core.Types.Base;
-
 namespace Mongo.Service.Core.Types
 {
     // Inherited from ApiBase
@@ -28,9 +25,6 @@ namespace Mongo.Service.Core.Types
 
 Add a new EntityType (it's stored in MongoDB) to Mongo.Service.Core:
 ```c#
-using Mongo.Service.Core.Storable.Base;
-using Mongo.Service.Core.Storage;
-
 namespace Mongo.Service.Core.Storable
 {
     // Set collection name. Inherit class from BaseEntity
@@ -44,9 +38,6 @@ namespace Mongo.Service.Core.Storable
 
 Implement custom Automapper mapping configuration if default is not enough:
 ```c#
-using Mongo.Service.Core.Storable;
-using Mongo.Service.Core.Types;
-
 namespace Mongo.Service.Core.Services.Mapping
 {
     public class Mapper<TApi, TEntity> : IMapper<TApi, TEntity> where TEntity : IBaseEntity where TApi : IApiBase
@@ -74,13 +65,6 @@ namespace Mongo.Service.Core.Services.Mapping
 
 Create new controller class responsible for your new ApiType:
 ```c#
-using System;
-using System.Collections.Generic;
-using System.Web.Http;
-using Mongo.Service.Core.Services;
-using Mongo.Service.Core.Storable;
-using Mongo.Service.Core.Types;
-
 namespace Mongo.Service.Core.Controllers
 {
     public class SampleController : ApiController
@@ -92,36 +76,25 @@ namespace Mongo.Service.Core.Controllers
             this.service = service;
         }
 
-        public IEnumerable<ApiSample> GetAll()
+        public async Task<IEnumerable<ApiSample>> GetAllAsync()
         {
-            return service.ReadAll();
-        }
-        
-        public ApiSample Get(Guid id)
-        {
-            return service.Read(id);
+            return await this.service.ReadAllAsync().ConfigureAwait(false);
         }
 
-        public ApiSync<ApiSample> Get(long lastSync)
+        public async Task<ApiSample> GetAsync(Guid id)
         {
-            ApiSample[] newData;
-            Guid[] deletedIds;
-            
-            // Synchronize client data with ticks. Client will get only new data
-            var newSync = service.ReadSyncedData(lastSync, out newData, out deletedIds);
+            return await this.service.ReadAsync(id).ConfigureAwait(false);
+        }
 
-            var apiSync = new ApiSync<ApiSample>
-            {
-                Data = newData,
-                DeletedData = deletedIds,
-                LastSync = newSync
-            };
+        public async Task<ApiSync<ApiSample>> GetAsync(long lastSync)
+        {
+            var apiSync = await this.service.ReadSyncedDataAsync(lastSync).ConfigureAwait(false);
             return apiSync;
         }
 
-        public void Post(ApiSample apiSample)
+        public async Task PostAsync(ApiSample apiSample)
         {
-            service.Write(apiSample);
+            await this.service.WriteAsync(apiSample).ConfigureAwait(false);
         }
     }
 }
