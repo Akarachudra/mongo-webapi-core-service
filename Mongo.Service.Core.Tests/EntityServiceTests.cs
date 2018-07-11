@@ -134,7 +134,7 @@ namespace Mongo.Service.Core.Tests
                     SomeData = "3"
                 }
             };
-            this.service.WriteAsync(apiEntities);
+            this.service.WriteAsync(apiEntities).Wait();
 
             var anonymousEntitiesBefore = apiEntities.Select(x => new { x.Id, x.SomeData }).Take(2);
             var readedEntities = this.service.ReadAsync(0, 2).Result;
@@ -198,13 +198,13 @@ namespace Mongo.Service.Core.Tests
             {
                 Id = Guid.NewGuid()
             };
-            this.service.WriteAsync(apiEntity1);
+            this.service.WriteAsync(apiEntity1).Wait();
 
             var apiEntity2 = new ApiSample
             {
                 Id = Guid.NewGuid()
             };
-            this.service.WriteAsync(apiEntity2);
+            this.service.WriteAsync(apiEntity2).Wait();
 
             apiSync = this.service.ReadSyncedDataAsync(apiSync.LastSync).Result;
 
@@ -216,7 +216,7 @@ namespace Mongo.Service.Core.Tests
 
             Assert.AreEqual(previousSync, apiSync.LastSync);
 
-            this.service.RemoveAsync(apiEntity2);
+            this.service.RemoveAsync(apiEntity2).Wait();
             apiSync = this.service.ReadSyncedDataAsync(apiSync.LastSync).Result;
             Assert.AreEqual(1, apiSync.DeletedData.Length);
             Assert.AreEqual(3, apiSync.LastSync);
@@ -230,14 +230,14 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid(),
                 SomeData = "1"
             };
-            this.service.WriteAsync(apiEntity1);
+            this.service.WriteAsync(apiEntity1).Wait();
 
             var apiEntity2 = new ApiSample
             {
                 Id = Guid.NewGuid(),
                 SomeData = "2"
             };
-            this.service.WriteAsync(apiEntity2);
+            this.service.WriteAsync(apiEntity2).Wait();
 
             var apiSync = this.service.ReadSyncedDataAsync(0, x => x.SomeData == "2").Result;
 

@@ -312,13 +312,13 @@ namespace Mongo.Service.Core.Tests
             {
                 Id = Guid.NewGuid()
             };
-            this.repository.WriteAsync(entity1);
+            this.repository.WriteAsync(entity1).Wait();
 
             var entity2 = new SampleEntity
             {
                 Id = Guid.NewGuid()
             };
-            this.repository.WriteAsync(entity2);
+            this.repository.WriteAsync(entity2).Wait();
 
             syncResult = this.repository.ReadSyncedDataAsync(syncResult.LastSync).Result;
 
@@ -330,7 +330,7 @@ namespace Mongo.Service.Core.Tests
 
             Assert.AreEqual(previousSync, syncResult.LastSync);
 
-            this.repository.RemoveAsync(entity2);
+            this.repository.RemoveAsync(entity2).Wait();
             syncResult = this.repository.ReadSyncedDataAsync(syncResult.LastSync).Result;
             Assert.AreEqual(1, syncResult.DeletedData.Count);
             Assert.AreEqual(3, syncResult.LastSync);
@@ -344,14 +344,14 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid(),
                 SomeData = "1"
             };
-            this.repository.WriteAsync(entity1);
+            this.repository.WriteAsync(entity1).Wait();
 
             var entity2 = new SampleEntity
             {
                 Id = Guid.NewGuid(),
                 SomeData = "2"
             };
-            this.repository.WriteAsync(entity2);
+            this.repository.WriteAsync(entity2).Wait();
 
             var syncResult = this.repository.ReadSyncedDataAsync(0, x => x.SomeData == "2").Result;
 
