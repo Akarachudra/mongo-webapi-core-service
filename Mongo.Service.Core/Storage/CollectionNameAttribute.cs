@@ -5,11 +5,11 @@ namespace Mongo.Service.Core.Storage
     [AttributeUsage(AttributeTargets.Class)]
     public class CollectionNameAttribute : Attribute
     {
-        public string Name { get; set; }
-
         public CollectionNameAttribute(string name)
         {
-            Name = name;
+            this.Name = name;
         }
+
+        public string Name { get; set; }
     }
 }

@@ -3,7 +3,8 @@ using MongoDB.Driver;
 
 namespace Mongo.Service.Core.Storable.Indexes
 {
-    public interface IIndexes<TEntity> where TEntity : IBaseEntity
+    public interface IIndexes<TEntity>
+        where TEntity : IBaseEntity
     {
         void CreateIndexes(IMongoCollection<TEntity> collection);
     }

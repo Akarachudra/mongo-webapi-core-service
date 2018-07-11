@@ -2,11 +2,11 @@
 {
     public class ServiceSettings : IServiceSettings
     {
-        public int Port { get; set; }
-
         public ServiceSettings()
         {
-            Port = 12512;
+            this.Port = 12512;
         }
+
+        public int Port { get; set; }
     }
 }

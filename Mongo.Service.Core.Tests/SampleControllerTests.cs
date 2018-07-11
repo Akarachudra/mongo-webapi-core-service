@@ -20,16 +20,16 @@ namespace Mongo.Service.Core.Tests
 
         public SampleControllerTests()
         {
-            mongoStorage = new MongoStorage(new MongoSettings());
-            var storage = new EntityStorage<SampleEntity>(mongoStorage, new Indexes<SampleEntity>());
+            this.mongoStorage = new MongoStorage(new MongoSettings());
+            var storage = new MongoRepository<SampleEntity>(this.mongoStorage, new Indexes<SampleEntity>());
             var mapper = new Mapper<ApiSample, SampleEntity>();
-            service = new EntityService<ApiSample, SampleEntity>(storage, mapper);
+            this.service = new EntityService<ApiSample, SampleEntity>(storage, mapper);
         }
 
         [SetUp]
         public void RunBeforeAnyTest()
         {
-            mongoStorage.ClearCollection<SampleEntity>();
+            this.mongoStorage.ClearCollection<SampleEntity>();
         }
 
         [Test]
@@ -48,12 +48,12 @@ namespace Mongo.Service.Core.Tests
             };
 
             var idsBefore = apiEntities.Select(x => x.Id);
-            var sampleController = new SampleController(service);
-            var resultEntities = sampleController.GetAll().ToArray();
+            var sampleController = new SampleController(this.service);
+            var resultEntities = sampleController.GetAllAsync().Result.ToArray();
             Assert.AreEqual(0, resultEntities.Length);
 
-            service.Write(apiEntities);
-            var resultIds = sampleController.GetAll().Select(x => x.Id).ToArray();
+            this.service.WriteAsync(apiEntities).Wait();
+            var resultIds = sampleController.GetAllAsync().Result.Select(x => x.Id).ToArray();
             CollectionAssert.AreEquivalent(idsBefore, resultIds);
         }
 
@@ -65,9 +65,9 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid()
             };
 
-            service.Write(apiEntity);
-            var sampleController = new SampleController(service);
-            var resultApiEntity = sampleController.Get(apiEntity.Id);
+            this.service.WriteAsync(apiEntity).Wait();
+            var sampleController = new SampleController(this.service);
+            var resultApiEntity = sampleController.GetAsync(apiEntity.Id).Result;
             Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, resultApiEntity));
         }
 
@@ -79,10 +79,10 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid()
             };
 
-            var sampleController = new SampleController(service);
-            sampleController.Post(apiEntity);
+            var sampleController = new SampleController(this.service);
+            sampleController.PostAsync(apiEntity).Wait();
 
-            var readedEtity = service.Read(apiEntity.Id);
+            var readedEtity = this.service.ReadAsync(apiEntity.Id).Result;
             Assert.IsTrue(ObjectsComparer.AreEqual(apiEntity, readedEtity));
         }
 
@@ -98,22 +98,22 @@ namespace Mongo.Service.Core.Tests
                 Id = Guid.NewGuid()
             };
 
-            var sampleController = new SampleController(service);
-            var apiSync = sampleController.Get(-1);
+            var sampleController = new SampleController(this.service);
+            var apiSync = sampleController.GetAsync(-1).Result;
             Assert.AreEqual(0, apiSync.LastSync);
             Assert.AreEqual(0, apiSync.Data.Length);
             Assert.AreEqual(0, apiSync.DeletedData.Length);
 
-            service.Write(apiEntity1);
-            apiSync = sampleController.Get(apiSync.LastSync);
+            this.service.WriteAsync(apiEntity1).Wait();
+            apiSync = sampleController.GetAsync(apiSync.LastSync).Result;
             Assert.AreEqual(1, apiSync.LastSync);
             Assert.AreEqual(1, apiSync.Data.Length);
             Assert.AreEqual(apiEntity1.Id, apiSync.Data[0].Id);
             Assert.AreEqual(0, apiSync.DeletedData.Length);
 
-            service.Write(apiEntity2);
-            service.Remove(apiEntity1);
-            apiSync = sampleController.Get(apiSync.LastSync);
+            this.service.WriteAsync(apiEntity2).Wait();
+            this.service.RemoveAsync(apiEntity1).Wait();
+            apiSync = sampleController.GetAsync(apiSync.LastSync).Result;
             Assert.AreEqual(3, apiSync.LastSync);
             Assert.AreEqual(1, apiSync.Data.Length);
             Assert.AreEqual(apiEntity2.Id, apiSync.Data[0].Id);

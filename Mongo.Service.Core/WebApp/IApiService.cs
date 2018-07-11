@@ -3,6 +3,7 @@
     public interface IApiService
     {
         void Start();
+
         void Stop();
     }
 }

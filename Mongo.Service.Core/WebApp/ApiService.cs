@@ -11,7 +11,7 @@
 
         public void Start()
         {
-            Microsoft.Owin.Hosting.WebApp.Start<Startup>($"http://+:{settings.Port}/");
+            Microsoft.Owin.Hosting.WebApp.Start<Startup>($"http://+:{this.settings.Port}/");
         }
 
         public void Stop()
