@@ -67,7 +67,7 @@ namespace Mongo.Service.Core.Storage
             Expression<Func<TEntity, bool>> additionalFilter = null)
         {
             var syncResult = new SyncResult<TEntity>();
-            var newLastSync = this.GetLastTick();
+            var newLastSync = await this.GetLastTickAsync().ConfigureAwait(false);
 
             Expression<Func<TEntity, bool>> newFilter = x => !x.IsDeleted && x.Ticks > lastSync && x.Ticks <= newLastSync;
             Expression<Func<TEntity, bool>> deletedFilter = x => x.IsDeleted && x.Ticks > lastSync && x.Ticks <= newLastSync;
@@ -107,7 +107,7 @@ namespace Mongo.Service.Core.Storage
 
             entity.LastModified = DateTime.UtcNow;
 
-            this.TryWriteSyncedEntity(entity);
+            await this.TryWriteSyncedEntityAsync(entity).ConfigureAwait(false);
         }
 
         public async Task WriteAsync(IEnumerable<TEntity> entities)
@@ -157,20 +157,20 @@ namespace Mongo.Service.Core.Storage
             return await this.Collection.CountAsync(filter).ConfigureAwait(false);
         }
 
-        public long GetLastTick()
+        public async Task<long> GetLastTickAsync()
         {
             var sort = Builders<TEntity>.Sort.Descending(x => x.Ticks);
-            var result = this.Collection.Find(FilterDefinition<TEntity>.Empty).Sort(sort).Limit(1).ToList();
+            var result = await this.Collection.Find(FilterDefinition<TEntity>.Empty).Sort(sort).Limit(1).ToListAsync().ConfigureAwait(false);
             return result.Count == 0 ? 0 : result[0].Ticks;
         }
 
-        public void UpdateTicks(Guid id)
+        public async Task UpdateTicksAsync(Guid id)
         {
             for (var i = 0; i < TicksWriteTries; i++)
             {
                 try
                 {
-                    var lastTicks = this.GetLastTick() + 1;
+                    var lastTicks = await this.GetLastTickAsync().ConfigureAwait(false) + 1;
                     var updateTicks = Builders<TEntity>.Update.Set(x => x.Ticks, lastTicks);
                     this.Collection.UpdateOne(x => x.Id == id, updateTicks);
                     return;
@@ -187,20 +187,20 @@ namespace Mongo.Service.Core.Storage
             throw new Exception($"Update ticks tries of {nameof(TEntity)} limit exceeded");
         }
 
-        public void Update(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition)
+        public async Task UpdateAsync(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition)
         {
-            this.Collection.UpdateOne(filter, updateDefinition);
+            await this.Collection.UpdateOneAsync(filter, updateDefinition).ConfigureAwait(false);
         }
 
-        public void UpdateWithTicks(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition)
+        public async Task UpdateWithTicksAsync(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition)
         {
             for (var i = 0; i < TicksWriteTries; i++)
             {
                 try
                 {
-                    var lastTicks = this.GetLastTick() + 1;
+                    var lastTicks = await this.GetLastTickAsync().ConfigureAwait(false) + 1;
                     var updateWithTicks = updateDefinition.Set(x => x.Ticks, lastTicks);
-                    this.Collection.UpdateOne(filter, updateWithTicks);
+                    await this.Collection.UpdateOneAsync(filter, updateWithTicks).ConfigureAwait(false);
                     return;
                 }
                 catch (MongoWriteException exception)
@@ -215,15 +215,15 @@ namespace Mongo.Service.Core.Storage
             throw new Exception($"Update with ticks tries of {nameof(TEntity)} limit exceeded");
         }
 
-        private void TryWriteSyncedEntity(TEntity entity)
+        private async Task TryWriteSyncedEntityAsync(TEntity entity)
         {
             for (var i = 0; i < TicksWriteTries; i++)
             {
-                entity.Ticks = this.GetLastTick() + 1;
+                entity.Ticks = await this.GetLastTickAsync().ConfigureAwait(false) + 1;
 
                 try
                 {
-                    this.Collection.ReplaceOne(x => x.Id == entity.Id, entity, new UpdateOptions { IsUpsert = true });
+                    await this.Collection.ReplaceOneAsync(x => x.Id == entity.Id, entity, new UpdateOptions { IsUpsert = true }).ConfigureAwait(false);
                     return;
                 }
                 catch (MongoWriteException exception)

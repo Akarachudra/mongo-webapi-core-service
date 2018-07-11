@@ -46,12 +46,12 @@ namespace Mongo.Service.Core.Storage
 
         Task<long> CountAsync(Expression<Func<TEntity, bool>> filter);
 
-        long GetLastTick();
+        Task<long> GetLastTickAsync();
 
-        void UpdateTicks(Guid id);
+        Task UpdateTicksAsync(Guid id);
 
-        void Update(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition);
+        Task UpdateAsync(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition);
 
-        void UpdateWithTicks(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition);
+        Task UpdateWithTicksAsync(Expression<Func<TEntity, bool>> filter, UpdateDefinition<TEntity> updateDefinition);
     }
 }

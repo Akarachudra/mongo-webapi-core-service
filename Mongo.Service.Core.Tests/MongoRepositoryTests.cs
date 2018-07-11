@@ -287,16 +287,16 @@ namespace Mongo.Service.Core.Tests
                 SomeData = "2"
             };
 
-            Assert.AreEqual(0, this.repository.GetLastTick());
+            Assert.AreEqual(0, this.repository.GetLastTickAsync().Result);
 
             this.repository.WriteAsync(entity1).Wait();
             var readedEntity1 = this.repository.ReadAsync(entity1.Id).Result;
-            Assert.AreEqual(1, this.repository.GetLastTick());
+            Assert.AreEqual(1, this.repository.GetLastTickAsync().Result);
             Assert.AreEqual(1, readedEntity1.Ticks);
 
             this.repository.WriteAsync(entity2).Wait();
             var readedEntity2 = this.repository.ReadAsync(entity2.Id).Result;
-            Assert.AreEqual(2, this.repository.GetLastTick());
+            Assert.AreEqual(2, this.repository.GetLastTickAsync().Result);
             Assert.AreEqual(2, readedEntity2.Ticks);
         }
 
@@ -368,7 +368,7 @@ namespace Mongo.Service.Core.Tests
             this.repository.WriteAsync(entity).Wait();
             var readedEntity = this.repository.ReadAsync(entity.Id).Result;
             var ticksBefore = readedEntity.Ticks;
-            this.repository.UpdateTicks(entity.Id);
+            this.repository.UpdateTicksAsync(entity.Id).Wait();
             readedEntity = this.repository.ReadAsync(entity.Id).Result;
             Assert.AreEqual(ticksBefore + 1, readedEntity.Ticks);
         }
@@ -387,7 +387,7 @@ namespace Mongo.Service.Core.Tests
             var ticksBefore = readedEntity.Ticks;
             var updater = this.repository.Updater;
             var updateDefinition = updater.Set(x => x.SomeData, dataAfter);
-            this.repository.Update(x => x.Id == entity.Id, updateDefinition);
+            this.repository.UpdateAsync(x => x.Id == entity.Id, updateDefinition);
             readedEntity = this.repository.ReadAsync(entity.Id).Result;
             Assert.AreEqual(ticksBefore, readedEntity.Ticks);
             Assert.AreEqual(dataAfter, readedEntity.SomeData);
@@ -407,7 +407,7 @@ namespace Mongo.Service.Core.Tests
             var ticksBefore = readedEntity.Ticks;
             var updater = this.repository.Updater;
             var updateDefinition = updater.Set(x => x.SomeData, dataAfter);
-            this.repository.UpdateWithTicks(x => x.Id == entity.Id, updateDefinition);
+            this.repository.UpdateWithTicksAsync(x => x.Id == entity.Id, updateDefinition).Wait();
             readedEntity = this.repository.ReadAsync(entity.Id).Result;
             Assert.AreEqual(ticksBefore + 1, readedEntity.Ticks);
             Assert.AreEqual(dataAfter, readedEntity.SomeData);
