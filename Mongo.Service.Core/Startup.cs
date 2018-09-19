@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Mongo.Service.Core.Entities;
+using Mongo.Service.Core.Repository;
+using Mongo.Service.Core.Repository.Indexes;
+using Mongo.Service.Core.Services;
+using Mongo.Service.Core.Services.Mapping;
+using Mongo.Service.Core.Types;
 
 namespace Mongo.Service.Core
 {
@@ -25,6 +25,12 @@ namespace Mongo.Service.Core
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddSingleton<IMongoStorage, MongoStorage>();
+            services.AddSingleton<IMongoSettings, MongoSettings>();
+            services.AddSingleton<IMongoRepository<SampleEntity>, MongoRepository<SampleEntity>>();
+            services.AddSingleton<IIndexes<SampleEntity>, Indexes<SampleEntity>>();
+            services.AddSingleton<IEntityService<ApiSample, SampleEntity>, EntityService<ApiSample, SampleEntity>>();
+            services.AddSingleton<IMapper<ApiSample, SampleEntity>, Mapper<ApiSample, SampleEntity>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
