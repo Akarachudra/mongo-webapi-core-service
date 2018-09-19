@@ -4,6 +4,6 @@ namespace Mongo.Service.Core.Types
 {
     public class ApiSample : ApiBase
     {
-        public int SomeData { get; set; }
+        public string SomeData { get; set; }
     }
 }
