@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Mongo.Service.Core.Storable.Base;
+using Mongo.Service.Core.Entities.Base;
 
-namespace Mongo.Service.Core.Storage
+namespace Mongo.Service.Core.Repository
 {
     public class SyncResult<TEntity>
         where TEntity : IBaseEntity

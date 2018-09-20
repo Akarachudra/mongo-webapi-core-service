@@ -1,9 +1,10 @@
 ﻿using System;
-using Mongo.Service.Core.Storable.Base;
+using Mongo.Service.Core.Entities.Base;
+using Mongo.Service.Core.Repository.Attributes;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace Mongo.Service.Core.Storage
+namespace Mongo.Service.Core.Repository
 {
     public class MongoStorage : IMongoStorage
     {
@@ -30,13 +31,11 @@ namespace Mongo.Service.Core.Storage
             var mongoUserName = settings.MongoUserName;
             if (!string.IsNullOrEmpty(mongoUserName))
             {
-                mongoClientSettings.Credentials = new[]
-                {
+                mongoClientSettings.Credential =
                     MongoCredential.CreateCredential(
                         mongoDataBaseName,
-                                                     mongoUserName,
-                                                     settings.MongoPassword)
-                };
+                        mongoUserName,
+                        settings.MongoPassword);
             }
 
             var client = new MongoClient(mongoClientSettings);

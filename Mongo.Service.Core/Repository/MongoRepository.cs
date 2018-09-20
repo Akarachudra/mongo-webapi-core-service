@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Mongo.Service.Core.Entities.Base;
 using Mongo.Service.Core.Extensions;
-using Mongo.Service.Core.Storable.Base;
-using Mongo.Service.Core.Storable.Indexes;
+using Mongo.Service.Core.Repository.Indexes;
 using MongoDB.Driver;
 
-namespace Mongo.Service.Core.Storage
+namespace Mongo.Service.Core.Repository
 {
     public class MongoRepository<TEntity> : IMongoRepository<TEntity>
-        where TEntity : IBaseEntity
+            where TEntity : IBaseEntity
     {
         private const int TicksWriteTries = 100;
 
@@ -149,12 +149,12 @@ namespace Mongo.Service.Core.Storage
 
         public async Task<long> CountAsync()
         {
-            return await this.Collection.CountAsync(FilterDefinition<TEntity>.Empty).ConfigureAwait(false);
+            return await this.Collection.CountDocumentsAsync(FilterDefinition<TEntity>.Empty).ConfigureAwait(false);
         }
 
         public async Task<long> CountAsync(Expression<Func<TEntity, bool>> filter)
         {
-            return await this.Collection.CountAsync(filter).ConfigureAwait(false);
+            return await this.Collection.CountDocumentsAsync(filter).ConfigureAwait(false);
         }
 
         public async Task<long> GetLastTickAsync()

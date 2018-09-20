@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 
-namespace Mongo.Service.Core.Storage
+namespace Mongo.Service.Core.Repository
 {
     public class MongoSettings : IMongoSettings
     {

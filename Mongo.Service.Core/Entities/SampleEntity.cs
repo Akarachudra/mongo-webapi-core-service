@@ -1,7 +1,7 @@
-﻿using Mongo.Service.Core.Storable.Base;
-using Mongo.Service.Core.Storage;
+﻿using Mongo.Service.Core.Entities.Base;
+using Mongo.Service.Core.Repository.Attributes;
 
-namespace Mongo.Service.Core.Storable
+namespace Mongo.Service.Core.Entities
 {
     [CollectionName("Sample")]
     public class SampleEntity : BaseEntity

@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Mongo.Service.Core.Entities.Base;
+using Mongo.Service.Core.Repository;
 using Mongo.Service.Core.Services.Mapping;
-using Mongo.Service.Core.Storable.Base;
-using Mongo.Service.Core.Storage;
 using Mongo.Service.Core.Types;
 using Mongo.Service.Core.Types.Base;
 
 namespace Mongo.Service.Core.Services
 {
     public class EntityService<TApi, TEntity> : IEntityService<TApi, TEntity>
-        where TApi : IApiBase
-        where TEntity : IBaseEntity
+            where TApi : IApiBase
+            where TEntity : IBaseEntity
     {
         private readonly IMapper<TApi, TEntity> mapper;
 

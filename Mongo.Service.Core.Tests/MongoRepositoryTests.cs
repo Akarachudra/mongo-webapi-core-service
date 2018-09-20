@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Mongo.Service.Core.Storable;
-using Mongo.Service.Core.Storable.Indexes;
-using Mongo.Service.Core.Storage;
+using Mongo.Service.Core.Entities;
+using Mongo.Service.Core.Repository;
+using Mongo.Service.Core.Repository.Indexes;
 using NUnit.Framework;
 
 namespace Mongo.Service.Core.Tests
@@ -15,7 +15,7 @@ namespace Mongo.Service.Core.Tests
 
         public MongoRepositoryTests()
         {
-            this.mongoStorage = new MongoStorage(new MongoSettings());
+            this.mongoStorage = new MongoStorage(new MongoSettings { MongoDatabaseName = "MongoServiceCoreTest" });
         }
 
         [SetUp]

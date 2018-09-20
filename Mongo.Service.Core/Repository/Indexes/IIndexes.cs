@@ -1,7 +1,7 @@
-﻿using Mongo.Service.Core.Storable.Base;
+﻿using Mongo.Service.Core.Entities.Base;
 using MongoDB.Driver;
 
-namespace Mongo.Service.Core.Storable.Indexes
+namespace Mongo.Service.Core.Repository.Indexes
 {
     public interface IIndexes<TEntity>
         where TEntity : IBaseEntity

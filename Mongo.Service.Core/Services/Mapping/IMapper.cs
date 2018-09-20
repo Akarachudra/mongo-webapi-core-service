@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Mongo.Service.Core.Storable.Base;
+using Mongo.Service.Core.Entities.Base;
 using Mongo.Service.Core.Types.Base;
 
 namespace Mongo.Service.Core.Services.Mapping
