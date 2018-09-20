@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Mongo.Service.Core.Storable.Base;
+using Mongo.Service.Core.Entities.Base;
 using MongoDB.Driver;
 
-namespace Mongo.Service.Core.Storage
+namespace Mongo.Service.Core.Repository
 {
     public interface IMongoRepository<TEntity>
         where TEntity : IBaseEntity

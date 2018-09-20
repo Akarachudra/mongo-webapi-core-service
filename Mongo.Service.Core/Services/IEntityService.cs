@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using Mongo.Service.Core.Storable.Base;
-using Mongo.Service.Core.Storage;
+using Mongo.Service.Core.Entities.Base;
+using Mongo.Service.Core.Repository;
 using Mongo.Service.Core.Types;
 using Mongo.Service.Core.Types.Base;
 

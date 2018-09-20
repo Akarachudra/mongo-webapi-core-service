@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mongo.Service.Core.Storage
+namespace Mongo.Service.Core.Repository.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class CollectionNameAttribute : Attribute

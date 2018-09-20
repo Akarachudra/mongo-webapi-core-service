@@ -1,11 +1,12 @@
-﻿using System.Web.Http;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace Mongo.Service.Core.Controllers.System
 {
-    [RoutePrefix("_status")]
-    public class StatusController : ApiController
+    [Route("_status")]
+    [ApiController]
+    public class StatusController : ControllerBase
     {
-        [Route("ping")]
+        [HttpGet("ping")]
         public PingResult GetPingResult()
         {
             return new PingResult { Status = "Ok" };

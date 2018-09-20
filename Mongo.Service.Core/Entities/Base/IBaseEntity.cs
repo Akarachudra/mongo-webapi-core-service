@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Mongo.Service.Core.Storable.Base
+namespace Mongo.Service.Core.Entities.Base
 {
     public interface IBaseEntity
     {

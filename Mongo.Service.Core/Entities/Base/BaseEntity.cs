@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Mongo.Service.Core.Storable.Base
+namespace Mongo.Service.Core.Entities.Base
 {
-    public abstract class BaseEntity : IBaseEntity
+    public class BaseEntity : IBaseEntity
     {
         public Guid Id { get; set; }
 
