@@ -15,7 +15,7 @@ namespace Mongo.Service.Core.Tests
 
         public MongoRepositoryTests()
         {
-            this.mongoStorage = new MongoStorage(new MongoSettings());
+            this.mongoStorage = new MongoStorage(new MongoSettings { MongoDatabaseName = "MongoServiceCoreTest" });
         }
 
         [SetUp]
