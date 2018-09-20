@@ -1,26 +1,19 @@
 # Mongo.Service.Core
-Mongo.Service.Core designed for the rapid implementation your own scalable RESTFull service based on ASP.NET WebApi and Owin Self Host.
+Mongo.Service.Core designed for the rapid implementation your own scalable RESTFull service based on ASP.NET Core WebApi.
 It uses MongoDB as a data store. Timeline (reading new, deleted and changed data from client) implementation based on optimistic loop.
 
 Some other features:
-* TopShelf for run as Windows Service.
 * Automapper for entities mapping.
-* DI Container - Simple Injector.
 
 ## How to use
 
 Add a new ApiType (your share this with client) to Mongo.Service.Core.Types project and inherit it from ApiBase:
 ```c#
-using System.Runtime.Serialization;
-using Mongo.Service.Core.Types.Base;
-
 namespace Mongo.Service.Core.Types
 {
     // Inherited from ApiBase
-    [DataContract]
     public class ApiSample : ApiBase
     {
-        [DataMember]
         public string SomeData { get; set; }
     }
 }
@@ -28,10 +21,7 @@ namespace Mongo.Service.Core.Types
 
 Add a new EntityType (it's stored in MongoDB) to Mongo.Service.Core:
 ```c#
-using Mongo.Service.Core.Storable.Base;
-using Mongo.Service.Core.Storage;
-
-namespace Mongo.Service.Core.Storable
+namespace Mongo.Service.Core.Entities
 {
     // Set collection name. Inherit class from BaseEntity
     [CollectionName("Sample")]
@@ -44,23 +34,22 @@ namespace Mongo.Service.Core.Storable
 
 Implement custom Automapper mapping configuration if default is not enough:
 ```c#
-using Mongo.Service.Core.Storable;
-using Mongo.Service.Core.Types;
-
 namespace Mongo.Service.Core.Services.Mapping
 {
-    public class Mapper<TApi, TEntity> : IMapper<TApi, TEntity> where TEntity : IBaseEntity where TApi : IApiBase
+    public class Mapper<TApi, TEntity> : IMapper<TApi, TEntity>
+        where TEntity : IBaseEntity
+        where TApi : IApiBase
     {
-        // Some another basic implementation
+    // Some another basic implementation
 		
-	// Override this
+	    // Override this
         protected virtual IMapper ConfigureApiToEntityMapper()
         {
             var toEntityMapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TApi, TEntity>());
             return toEntityMapperConfig.CreateMapper();
         }
 
-	// And this
+	    // And this
         protected virtual IMapper ConfigureEntityToApiMapper()
         {
             var toApiMapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TEntity, TApi>());
@@ -74,16 +63,11 @@ namespace Mongo.Service.Core.Services.Mapping
 
 Create new controller class responsible for your new ApiType:
 ```c#
-using System;
-using System.Collections.Generic;
-using System.Web.Http;
-using Mongo.Service.Core.Services;
-using Mongo.Service.Core.Storable;
-using Mongo.Service.Core.Types;
-
 namespace Mongo.Service.Core.Controllers
 {
-    public class SampleController : ApiController
+    [Route("api/[controller]")]
+    [ApiController]
+    public class SampleController : ControllerBase
     {
         private readonly IEntityService<ApiSample, SampleEntity> service;
 
@@ -92,36 +76,29 @@ namespace Mongo.Service.Core.Controllers
             this.service = service;
         }
 
-        public IEnumerable<ApiSample> GetAll()
+        [HttpGet("all")]
+        public async Task<IEnumerable<ApiSample>> GetAllAsync()
         {
-            return service.ReadAll();
-        }
-        
-        public ApiSample Get(Guid id)
-        {
-            return service.Read(id);
+            return await this.service.ReadAllAsync().ConfigureAwait(false);
         }
 
-        public ApiSync<ApiSample> Get(long lastSync)
+        [HttpGet("{id}")]
+        public async Task<ApiSample> GetAsync(Guid id)
         {
-            ApiSample[] newData;
-            Guid[] deletedIds;
-            
-            // Synchronize client data with ticks. Client will get only new data
-            var newSync = service.ReadSyncedData(lastSync, out newData, out deletedIds);
+            return await this.service.ReadAsync(id).ConfigureAwait(false);
+        }
 
-            var apiSync = new ApiSync<ApiSample>
-            {
-                Data = newData,
-                DeletedData = deletedIds,
-                LastSync = newSync
-            };
+        [HttpGet]
+        public async Task<ApiSync<ApiSample>> GetAsync(long lastSync)
+        {
+            var apiSync = await this.service.ReadSyncedDataAsync(lastSync).ConfigureAwait(false);
             return apiSync;
         }
 
-        public void Post(ApiSample apiSample)
+        [HttpPost]
+        public async Task PostAsync(ApiSample apiSample)
         {
-            service.Write(apiSample);
+            await this.service.WriteAsync(apiSample).ConfigureAwait(false);
         }
     }
 }
@@ -129,14 +106,15 @@ namespace Mongo.Service.Core.Controllers
 
 Configure DI container at Startup class:
 ```c#
-private static void ConfigureContainer(Container container)
+public void ConfigureServices(IServiceCollection services)
 {
-    container.RegisterSingleton<IMongoStorage, MongoStorage>();
-    container.RegisterSingleton<IMongoSettings, MongoSettings>();
-    container.RegisterSingleton<IEntityStorage<SampleEntity>, EntityStorage<SampleEntity>>();
-    container.RegisterSingleton<IIndexes<SampleEntity>, Indexes<SampleEntity>>();
-    container.RegisterSingleton<IEntityService<ApiSample, SampleEntity>, EntityService<ApiSample, SampleEntity>>();
-    container.RegisterSingleton<IMapper<ApiSample, SampleEntity>, Mapper<ApiSample, SampleEntity>>();
+    services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+    services.AddSingleton<IMongoStorage, MongoStorage>();
+    services.AddSingleton<IMongoSettings, MongoSettings>();
+    services.AddSingleton<IMongoRepository<SampleEntity>, MongoRepository<SampleEntity>>();
+    services.AddSingleton<IIndexes<SampleEntity>, Indexes<SampleEntity>>();
+    services.AddSingleton<IEntityService<ApiSample, SampleEntity>, EntityService<ApiSample, SampleEntity>>();
+    services.AddSingleton<IMapper<ApiSample, SampleEntity>, Mapper<ApiSample, SampleEntity>>();
 }
 ```
 
